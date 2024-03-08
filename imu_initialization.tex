@@ -1,0 +1,44 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+
+\title{Attitude and IMU Bias Initialization}
+\author{Taylor Pool}
+\date{Mar 7, 2024}
+
+\begin{document}
+
+\maketitle
+
+\section{Problem Statement}
+
+Let $w$ be the inertial frame. Let $r$ be the robot body frame aligned with the IMU. Let $^w n$ be the normal force in the world frame.
+Given IMU measurements $(^r \omega^k, ^r a^k)$, we seek to estimate
+
+\begin{itemize}
+	\item Gyroscope bias $^r_\omega b$
+	\item Accelerometer bias $^r_a b$
+	\item Rotation of robot in world frame $^w R_r$
+\end{itemize}
+
+\section{Gyroscope}
+
+We assume that the following relationship holds
+\begin{equation}
+	^r_\mathrm{true} \omega^k = ^r \omega^k + ^r_\omega b + \eta_\omega^k
+\end{equation}
+
+Where the bias is normally distributed as $^r_\omega b \sim \mathcal{N}(0, \Sigma_\omega)$,
+and the white noise is normally distributed as $\eta_\omega^k \sim \mathcal{N}(0, \Sigma_\eta)$.
+
+Next, we assume that in this case, the robot is stationary, so that $^r_\mathrm{true} \omega^k = 0$.
+
+Now, we have
+\begin{equation}
+	^r_\omega b = -\mathbb{E}\left[^r \omega\right]
+\end{equation}
+
+\section{Accelerometer}
+
+\end{document}
