@@ -1,0 +1,213 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+\title{Optimization}
+\author{Taylor Pool}
+\date{June 2023}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+This is a series of notes on optimization techniques.
+
+\section{Unconstrained Optimization}
+
+The fundamental problem we wish to solve is 
+
+\begin{align}
+    \min_x f(x) \\
+    x \in \mathbb{R}^n \\
+    f : \mathbb{R}^n \rightarrow \mathbb{R}
+\end{align}
+
+Now we assume that $f$ is twice differentiable.
+
+\section{Differentiation}
+
+\begin{align}
+    f &: \mathbb{R}^n \rightarrow \mathbb{R} \\
+    Df &: \mathbb{R}^n \rightarrow \mathbb{R}^{1 \times n} \\
+    \nabla f &: \mathbb{R}^n \rightarrow \mathbb{R}^n \\
+    D^2 f &: \mathbb{R}^n \rightarrow \mathbb{R}^{n \times n}
+\end{align}
+
+\begin{align}
+    D_i f &= \frac{\partial f}{\partial x_i} \\
+    D_{ij} f &= \frac{\partial^2 f}{\partial x_i \partial x_j} \\
+    Df &= \begin{bmatrix}
+        D_1 f & D_2 f & \cdots & D_n f
+    \end{bmatrix} \\
+    \nabla f &= D^\mathrm{T} f \\
+    D^2 f &= D \nabla f \\
+    &= \begin{bmatrix}
+        D_{11} f & D_{12} f & \cdots & D_{1n} f \\
+        D_{21} f & D_{22} f & \cdots & D_{2n} f \\
+        \vdots & \vdots & \ddots & \vdots \\
+        D_{n1} f & D_{n2} f & \cdots & D_{nn} f
+    \end{bmatrix}
+\end{align}
+
+Note that since $ \forall i, j \in \{1, 2, \ldots n \}, D_{ij} f = D_{ji}$, we have $\left[ D^2 f \right]^\mathrm{T} = D^2 f$
+
+\section{Taylor Expansion}
+\begin{align}
+    f(x + \Delta x) &= f(x) + Df(x) \Delta x + \frac{1}{2} {\Delta x}^\mathrm{T} D^2 f(x) \Delta x + O \left( {\Delta x}^3 \right) \\
+    &\approx f(x) + Df(x) \Delta x + \frac{1}{2} {\Delta x}^\mathrm{T} D^2 f(x) \Delta x
+\end{align}
+
+\section{First Order Necessary Condition for Global Optimum}
+
+\begin{align}
+    \forall x \in \mathbb{R}^n, \quad f(x^*) \leq f(x) \implies Df(x^*) &= 0
+\end{align}
+
+\section{Second Order Necessary Conditions for Global Optimum}
+
+Some notation here for a matrix $A \in \mathbb{R}^{n \times n}$:
+\begin{align}
+    A > 0 \iff x^\mathrm{T} A x > 0, \quad \forall x \in \mathbb{R}^n \\
+    A \geq 0 \iff x^\mathrm{T} A x \geq 0, \quad \forall x \in \mathbb{R}^n
+\end{align}
+
+\begin{align}
+    \forall x \in \mathbb{R}^n, \quad f(x^*) \leq f(x) \implies D^2f(x^*) \geq 0
+\end{align}
+
+\section{First and Second Order Sufficient Conditions for Local Optimum}
+
+\begin{align}
+    Df(x^*) = 0 \land D^2f(x^*) > 0 \implies \\
+    \exists \epsilon > 0 \quad \mathrm{s.t} \quad 0 < || x - x^* || < \epsilon \implies f(x^*) \leq f(x) 
+\end{align}
+
+\section{Analytic Solutions}
+We can sometimes solve unconstrained optimization problems analytically. We can do so as follows.
+
+\begin{enumerate}
+    \item Find the set $S = \left\{ x \in \mathbb{R}^n : Df(x) = 0 \land D^2 f(x) > 0\right\}$
+    \item Find the set $T = \left\{ x \in S : D^2f(x) > 0 \right\}$
+    \item $x^* = \min T$
+\end{enumerate}
+
+\section{Newton's Method}
+Most of the time however, these optimization problems can be very difficult to solve analytically. We can use iterative numerical methods instead.
+
+Recall that
+\begin{align}
+    f(x + \Delta x) &\approx f(x) + Df(x) \Delta x \\
+    Df(x + \Delta x) &\approx Df(x) + {\Delta x}^\mathrm{T} D^2 f(x) 
+\end{align}
+
+We set $Df(x + \Delta x) = 0$ and solve for $\Delta x$.
+\begin{align}
+    0 &= Df(x) + {\Delta x}^\mathrm{T} D^2 f(x) \\
+    D^2 f(x) \Delta x &= - D^\mathrm{T} f(x)
+\end{align}
+
+The algorithm proceeds as follows:
+\begin{enumerate}
+    \item Set $x_0$.
+    \item While not converged to some absolute or relative amount,
+    \item Solve $D^2 f(x_k) \Delta x = -D^\mathrm{T} f(x_k)$ for $\Delta x$.
+    \item Set $x_{k+1} = x_k + \Delta x$
+\end{enumerate}
+
+\section{Nonlinear Least Squares}
+
+In this section, we analyze what to do when our cost function appears as the following:
+\begin{align}
+    f(x) &= \frac{1}{2} r^\mathrm{T}(x) r(x) \\
+    r &: \mathbb{R}^n \rightarrow \mathbb{R}^k \\
+    Dr &: \mathbb{R}^n \rightarrow \mathbb{R}^{k \times n} \\
+\end{align}
+
+We must introduce two new notations.
+\begin{align}
+    A &\in \mathbb{R}^{n \times m} \\
+    A &= \begin{bmatrix}
+        A_1 & A_2 & \cdots & A_m
+    \end{bmatrix} \\
+    \mathrm{vec}(A) &\in \mathbb{R}^{nm} \\
+    \mathrm{vec}(A) &= \begin{bmatrix}
+        A_1 \\
+        A_2 \\
+        \vdots \\
+        A_m
+    \end{bmatrix}
+\end{align}
+
+Also, let $\otimes$ be the Kroneker Product such that
+\begin{align}
+    A &\in \mathbb{R}^{n \times m} \\
+    B &\in \mathbb{R}^{l \times p} \\
+    A \otimes B &\in \mathbb{R}^{nl \times mp} \\
+    A \otimes B &= \begin{bmatrix}
+        a_{11} B & a_{12} B & \cdots & a_{1m} B \\
+        a_{21} B & a_{22} B & \cdots & a_{2m} B \\
+        \vdots & \vdots & \ddots & \vdots \\
+        a_{n1} B & a_{n2} B & \cdots & a_{nm} B
+    \end{bmatrix}
+\end{align}
+
+Finally, let $I_n \in \mathbb{R}^{n \times n}$ be the identity matrix.
+
+Then we have
+\begin{align}
+    Df(x) &= r^\mathrm{T}(x) Dr(x) \\
+    D^2 f(x) &= \left[ Dr(x) \right]^\mathrm{T} Dr(x) + \left( r^\mathrm{T} (x) \otimes I_n \right) D \left[ \mathrm{vec} \left( Dr \right) \right](x)
+\end{align}
+
+\section{Gauss-Newton Method}
+
+In a lot of cases, the computing $D^2 f(x) $ can be expensive. This is because of the $\left( r^\mathrm{T} (x) \otimes I_n \right) D \left[ \mathrm{vec} \left( Dr \right) \right](x)$ term above. Gauss-Newton simply omits this, and approximates
+\begin{align}
+    D^2 f(x) \approx \left[ Dr(x) \right]^\mathrm{T} Dr(x)
+\end{align}
+
+It then proceeds through Newton's Method as normal.
+
+\section{Levenberg-Marquart Method}
+
+\section{Armijo Rule}
+
+\section{Equality Constraints}
+
+We now move away from unconstrained optimization to talk about equality constraints.
+
+\begin{align}
+    \min_{x} f(x) \\
+    \mathrm{s.t.} \quad g(x) = 0 \\
+    x \in \mathbb{R}^n \\
+    g : \mathbb{R}^n \rightarrow \mathbb{R}^m
+\end{align}
+
+Then we introduce a Lagrange Multiplier $\lambda \in \mathbb{R}^m$ and we create the Lagrangian
+
+\begin{align}
+    \mathcal{L}(x, \lambda) &= f(x) + \lambda^\mathrm{T} g(x)
+\end{align}
+
+Then the optimal solution is found to the Lagrangian with respect to $x$ and $\lambda$.
+
+\begin{align}
+    \min_{x,\lambda} \mathcal{L}(x,\lambda)
+\end{align}
+
+We can use all of our previous methods discussed in order to optimize.
+
+\section{Inequality Constraints}
+
+\begin{align}
+    \min_x & f(x) \\
+    &\mathrm{s.t.} \quad g(x) = 0 \\
+    &\mathrm{s.t.} \quad h(x) \leq 0
+\end{align}
+
+There are a few options here. We can use Augmented Lagrangian Methods or we can use Interior-Point/Barrier Function Methods.
+
+\end{document}

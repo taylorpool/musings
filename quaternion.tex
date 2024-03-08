@@ -1,0 +1,224 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{bm}
+\usepackage{mathtools}
+
+\newcommand{\transpose}[1]{#1^\mathrm{T}}
+
+\title{Quaternion Notes}
+\author{Taylor Pool}
+\date{December 2022}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+Quaternions are an important representation of orientation in robotics. They are defined as 
+
+Note that quaternions are vectors $\mathbb{R}^4$. They just have a special group operation overlayed on top of the vector space.
+
+Unit quaternions on the other hand are a \pmb{manifold} embedded in $\mathbb{R}^4$.
+
+\begin{align*}
+    q &= q_w + q_x i + q_y j + q_z k
+\end{align*}
+Or we also say a quaternion is
+\begin{align*}
+    \pmb{q} &= \begin{bmatrix}
+        q_w \\
+        q_x \\
+        q_y \\
+        q_z
+    \end{bmatrix} \\
+    q &= \begin{bmatrix}
+        1 & i & j & k
+    \end{bmatrix} \pmb{q}
+\end{align*}
+
+Where
+\begin{align*}
+    ij &= k \\
+    jk &= i \\
+    i^2 &= j^2 = k^2 = -1 \\
+\end{align*}
+We can then derive
+\begin{align*}
+    ik &= -j
+\end{align*}
+
+A special group is the group of unit quaternions such that
+\begin{align*}
+    || \pmb{q} || &= || \pmb{q} ||^2 = q_w^2 + q_x^2 + q_y^2 + q_z^2 = 1
+\end{align*}
+
+Suppose we have a quaternion $\pmb{q} \ne \pmb{0}$. We wish to find $\Delta \pmb{q}$ such that $\pmb{q} + \Delta \pmb{q} $ is a unit quaternion, while minimizing $||\Delta \pmb{q}||^2$
+
+Then we may formulate this as a convex optimization problem as follows:
+
+\begin{align}
+    \min \quad & || \Delta \pmb{q} ||^2 \\
+    \mathrm{s.t.} \quad & || \pmb{q} + \Delta \pmb{q} ||^2 -1 = 0
+\end{align}
+
+We introduce the augmented lagragian with multiplier $\lambda$
+\begin{align*}
+    \mathcal{L} &= || \Delta \pmb{q} ||^2 + \lambda \left[ || \pmb{q} + \Delta \pmb{q} ||^2 - 1 \right] \\
+    &= \transpose{\left(\Delta \pmb{q} \right)} \Delta \pmb{q} + \lambda \left[ \transpose{\left(\pmb{q} + \Delta \pmb{q}\right)} \left(\pmb{q} + \Delta \pmb{q} \right) - 1 \right] \\
+    &= \transpose{\left(\Delta \pmb{q} \right)} \Delta \pmb{q} + \lambda \left[ \transpose{\pmb{q}} \pmb{q} + 2\transpose{\left(\Delta \pmb{q} \right)} \pmb{q} + \transpose{\left(\Delta \pmb{q} \right)} \Delta \pmb{q}  - 1 \right] \\
+\end{align*}
+Then we have
+\begin{align*}
+    \mathrm{D}\mathcal{L} &= 2 \transpose{\left(\Delta \pmb{q} \right)} + 2 \lambda \left[ \transpose{\pmb{q}} + \transpose{\left(\Delta \pmb{q} \right)} \right] \\
+    &= \transpose{\pmb{0}}
+\end{align*}
+Thus,
+\begin{align*}
+    \Delta \pmb{q} + \lambda \left[ \pmb{q} + \Delta \pmb{q} \right] &= \pmb{0} \\
+    \Delta \pmb{q} (1 + \lambda) + \lambda \pmb{q} &= \pmb{0} \\
+    \Delta \pmb{q} &= -\frac{\lambda \pmb{q}}{1 + \lambda}
+\end{align*}
+Then by substitution we have
+\begin{align*}
+    || \pmb{q} + \Delta \pmb{q} ||^2 -1 = 0 \\
+    || \pmb{q} - \frac{\lambda \pmb{q}}{1 + \lambda} ||^2 - 1 &= 0 \\
+    || \frac{1}{1 + \lambda} \pmb{q} ||^2 - 1 &= 0 \\
+    || \pmb{q} ||^2 - (1+\lambda)^2 &= 0 \\
+\end{align*}
+We can formulate this as a quadratic in $\lambda$ as follows
+\begin{align*}
+    \lambda^2 + 2\lambda + 1 - || \pmb{q} ||^2 &= 0 \\
+    \lambda &= \frac{-2 \pm \sqrt{4 - 4\left(1- ||\pmb{q}||^2\right)}}{2} \\
+    &= -1 \pm || \pmb{q} ||
+\end{align*}
+So we have
+\begin{align*}
+    \Delta \pmb{q} &= - \frac{\lambda}{1 + \lambda} \pmb{q} \\
+    &= - \frac{-1 \pm || \pmb{q} ||}{1 + -1 \pm || \pmb{q} ||} \pmb{q} \\
+    &= \frac{1 \mp || \pmb{q} || }{\pm || \pmb{q} ||} \pmb{q}
+\end{align*}
+These are two potential solutions but we seek the one that minimizes $|| \Delta \pmb{q} || ^2$.
+\begin{align*}
+    || \Delta \pmb{q} ||^2 &= \left( \frac{1 \mp || \pmb{q} ||}{\pm || \pmb{q} ||} \right)^2 || \pmb{q} ||^2
+\end{align*}
+Since $|| \pmb{q} || > 0$, we have that
+\begin{align*}
+    \left( \frac{1 - ||\pmb{q}|| }{||\pmb{q}||} \right)^2 &= \frac{1 - 2 || \pmb{q} || + ||\pmb{q}||^2}{||\pmb{q}||^2} \\
+    &< \frac{1 - 2 || \pmb{q} || + ||\pmb{q}||^2}{||\pmb{q}||^2} + \frac{4 || \pmb{q} ||}{|| \pmb{q} ||^2} \\
+    &= \frac{1 + 2 || \pmb{q} || + ||\pmb{q}||^2}{||\pmb{q}||^2} \\
+    &= \left( \frac{1 + ||\pmb{q}|| }{-||\pmb{q}||} \right)^2
+\end{align*}
+Thus, we have eliminated one of the proposals and have arrived at our final solution:
+\begin{align}
+    \Delta \pmb{q} &= \frac{1 - ||\pmb{q} ||}{|| \pmb{q} ||} \pmb{q}
+\end{align}
+Then $||\Delta \pmb{q}||^2$ is minimized while satisfying $|| \pmb{q} + \Delta \pmb{q} || = 1$
+Then
+\begin{align*}
+    \pmb{q} + \Delta \pmb{q} &= \frac{1 - ||\pmb{q}||}{||\pmb{q}||} \pmb{q} + \pmb{q} \\
+    &= \frac{\pmb{q}}{||\pmb{q}||}
+\end{align*}
+
+\section{Optimization over Quaternions}
+
+\begin{align*}
+    \prescript{w}{}{\pmb{q}}_{a} &= \begin{bmatrix}
+        \prescript{w}{}{s}_a \\
+        \prescript{w}{}{v}_a
+    \end{bmatrix} \\
+    \prescript{a}{}{\pmb{q}}_b &= \begin{bmatrix}
+        \prescript{a}{}{s}_b \\
+        \prescript{a}{}{v}_b
+    \end{bmatrix}
+\end{align*}
+
+\subsection{Quaternion Composition}
+
+\begin{align*}
+    L \left( \pmb{q} \right) &= \begin{bmatrix}
+        q_w & -q_x & -q_y & -q_z \\
+        q_x & q_w & -q_z & q_y  \\
+        q_y & q_z & q_w & -q_x \\
+        q_z & -q_y & q_x & q_w
+    \end{bmatrix} \\
+\end{align*}
+
+\begin{align*}
+    R \left( \pmb{q} \right) &= \begin{bmatrix}
+        q_w & -q_x & -q_y & -q_z \\
+        q_x & q_w & q_z & -q_y  \\
+        q_y & -q_z & q_w & q_x \\
+        q_z & q_y & -q_x & q_w
+    \end{bmatrix}
+\end{align*}
+
+\begin{align*}
+    \prescript{w}{}{\pmb{q}}_b &= f(\prescript{w}{}{\pmb{q}}_a, \prescript{a}{}{\pmb{q}}_b) \\
+    &= L \left( \prescript{w}{}{\pmb{q}}_a \right) \prescript{a}{}{\pmb{q}}_b \\
+    &= R \left( \prescript{a}{}{\pmb{q}}_b \right) \prescript{w}{}{\pmb{q}}_a \\
+\end{align*}
+
+\begin{align*}
+    Df(\pmb{q}_1, \pmb{q}_2) &= \begin{bmatrix}
+        R(\pmb{q}_2) & L(\pmb{q}_1)
+    \end{bmatrix}
+\end{align*}
+
+\subsection{Quaternion-Point Rotation}
+
+\begin{align*}
+    M\left( \pmb{q} \right) &= \begin{bmatrix}
+        q_w^2 + q_x^2 - q_y^2 - q_z^2 & 2(q_x q_y - q_w q_z) & 2(q_x q_z + q_w q_y) \\
+        2(q_x q_y + q_w q_z) & q_w^2 - q_x^2 + q_y^2 - q_z^2 & 2(q_y q_z - q_w q_x) \\
+        2(q_x q_z - q_w q_y) & 2(q_y q_z + q_w q_x) & q_w^2 - q_x^2 - q_y^2 + q_z^2
+    \end{bmatrix}
+\end{align*}
+
+\begin{align*}
+    N(\pmb{q}, x) &= \begin{bmatrix}
+        2 q_w x - 2 q_z y + 2 q_y z & 2 q_x x + 2 q_y y + 2 q_z z & -2 q_y x + 2 q_x y + 2 q_w z & -2 q_z x - 2 q_w y + 2 q_x z \\
+        2 q_z x + 2 q_w y - 2 q_x z & 2 q_y x - 2 q_x y - 2 q_w z & 2 q_x x + 2 q_y y + 2 q_z z & 2 q_w x - 2 q_z y + 2 q_y z \\
+        -2 q_y x + 2 q_x y + 2 q_w z & 2 q_z x + 2 q_w y - 2 q_x z & - 2 q_w x + 2 q_z y - 2 q_y z & 2 q_x x + 2 q_y y + 2 q_z z \\
+    \end{bmatrix}
+\end{align*}
+
+\begin{align*}
+    \prescript{b}{}{x} &= g\left(\prescript{b}{}{\pmb{q}}_a, \prescript{a}{}{x}\right) \\
+    &= \left(\prescript{b}{}{\pmb{q}}_a * \hat{\prescript{a}{}{x}}\right)^\vee \\
+    &= M\left( \prescript{b}{}{\pmb{q}}_a \right) \prescript{a}{}{x} \\
+    &= N\left( \prescript{b}{}{\pmb{q}}_a, \prescript{a}{}{x} \right) \prescript{b}{}{\pmb{q}}_a
+\end{align*}
+
+\begin{align*}
+    Dg(\pmb{q}, x) &= \begin{bmatrix}
+        N(\pmb{q}, x) & M(\pmb{q})
+    \end{bmatrix}
+\end{align*}
+
+\subsection{Pose Composition}
+
+\begin{align*}
+    \prescript{c}{}{T}_b &= \left( \prescript{c}{}{\pmb{q}}_b, \prescript{c}{}{t}_b \right) \\
+    \prescript{b}{}{T}_a &= \left( \prescript{b}{}{\pmb{q}}_a, \prescript{b}{}{t}_a \right) \\
+    \prescript{c}{}{T}_a &= h\left( \prescript{c}{}{T}_b, \prescript{b}{}{T}_a \right) \\
+    &= \left( f\left(\prescript{c}{}{\pmb{q}}_b, \prescript{b}{}{\pmb{q}}_a \right), g \left( \prescript{c}{}{\pmb{q}}_b, \prescript{b}{}{t}_a \right) + \prescript{c}{}{t}_b \right) \\
+\end{align*}
+
+Then we have
+
+\begin{align*}
+    Dh\left(\prescript{c}{}{T}_b, \prescript{b}{}{T}_a \right) &= \begin{bmatrix}
+        D_1 f\left(\prescript{c}{}{\pmb{q}}_b, \prescript{b}{}{\pmb{q}}_a \right)& 0 &  D_1 f\left(\prescript{c}{}{\pmb{q}}_b, \prescript{b}{}{\pmb{q}}_a \right) & 0 \\
+        D_1 g\left( \prescript{c}{}{\pmb{q}}_b, \prescript{b}{}{t}_a\right) & I_3 & 0 & D_2 g\left( \prescript{c}{}{\pmb{q}}_b, \prescript{b}{}{t}_a\right)
+    \end{bmatrix} \\
+    &= \begin{bmatrix}
+        R\left( \prescript{c}{}{\pmb{q}}_b \right) & 0_{4 \times 3} & L\left( \prescript{b}{}{\pmb{q}}_a \right) & 0_{4 \times 3} \\
+        N\left( \prescript{c}{}{\pmb{q}}_b, \prescript{b}{}{t}_a \right) & I_3 & 0_{3 \times 4} & M\left( \prescript{c}{}{\pmb{q}}_b \right)
+    \end{bmatrix}
+\end{align*}
+
+\end{document}

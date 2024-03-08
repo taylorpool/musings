@@ -1,0 +1,427 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{amsmath}
+\usepackage{mathdots}
+\usepackage{amsfonts}
+
+\title{Linear Algebra}
+\author{Taylor Pool}
+\date{November 2023}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+\section{Solving $Ax = b$ from subtitution}
+
+\subsection{From Top Left}
+
+\begin{equation*}
+    A = \begin{bmatrix}
+        a_{0,0} & 0 & \cdots & 0 \\
+        a_{1,0} & a_{1,1} & \cdots & 0 \\
+        \vdots & \vdots & \ddots & \vdots \\
+        a_{n-1,0} & a_{n-1,1} & \cdots & a_{n-1,n-1}
+    \end{bmatrix}
+\end{equation*}
+
+Then we have
+\begin{align*}
+    a_{0,0} x_0 &= b_0 \\
+    a_{1,0} x_0 + a_{1,1} x_1 &= b_1 \\
+    \vdots \\
+    \sum_{j = 0}^i a_{i,j} x_j &= b_i \\
+    x_i &= \frac{1}{a_{i,i}} \left[ b_i - \sum_{j=0}^{i-1} a_{i,j} x_j \right]
+\end{align*}
+
+\subsection{From Top Right}
+
+\begin{equation*}
+    A = \begin{bmatrix}
+        0 & \cdots & 0 & a_{0,n-1} \\
+        0 & \cdots & a_{1,n-2} & a_{1,n-1} \\
+        \vdots & \iddots & \vdots & \vdots \\
+        a_{n-1,0} & \cdots & a_{n-1,n-2} & a_{n-1,n-1}
+    \end{bmatrix}
+\end{equation*}
+
+Then we have
+\begin{align*}
+    a_{0,n-1} x_{n-1} &= b_0 \\
+    a_{1,n-2} x_{n-2} + a_{1,n-1} x_{n-1} &= b_1 \\
+    \vdots \\
+    \sum_{j=n-1-i}^{n-1} a_{i,j} x_j &= b_i \\
+    x_{n-1-i} &= \frac{1}{a_{n-1-i,n-1-i}}\left[ b_i - \sum_{j=n-i}^{n-1} a_{i,j} x_j \right]
+\end{align*}
+
+\subsection{From Bottom Left}
+
+\begin{equation*}
+    A = \begin{bmatrix}
+        a_{0,0} & a_{0,1} & \cdots & a_{0,n-1} \\
+        \vdots & \vdots & \iddots & 0 \\
+        a_{n-2,0} & a_{n-2,1} & \cdots & 0 \\
+        a_{n-1,0} & 0 & \cdots & 0
+    \end{bmatrix}
+\end{equation*}
+
+Then we have
+\begin{align*}
+    a_{n-1,0} x_0 &= b_{n-1} \\
+    a_{n-2,0} x_0 + a_{n-2,1} x_1 &= b_{n-2} \\
+    \vdots \\
+    \sum_{j=0}^i a_{n-1-i}
+\end{align*}
+
+\section{Forward Substitution}
+
+Let $A \in \mathbb{R}^{n \times n}$ be lower triangular such that
+\begin{align*}
+    A &= \begin{bmatrix}
+        a_{00} & 0 & \cdots & 0 \\
+        a_{10} & a_{11} & \cdots & 0 \\
+        \vdots & \vdots & \ddots & 0 \\
+        a_{n0} & a_{n1} & \cdots & a_{nn}
+    \end{bmatrix}
+\end{align*}
+
+This means that for $i \in \{0, 1, \ldots, n \}$
+\begin{align*}
+    \sum_{j=0}^i a_{ij} x_j &= b_i
+\end{align*}
+
+Now let $x, b \in \mathbb{R}^n$.
+We seek to solve $A x = b$ for $x$, given $A,b$.
+
+We proceed by induction.
+
+\subsection{Base Case}
+\begin{align*}
+    a_{00} x_0 &= b_0 \\
+    x_0 &= b_0 / a_{00}
+\end{align*}
+
+\subsection{Inductive Step}
+Suppose that $x_0, x_1, \ldots, x_i$ are known.
+Then we can compute
+\begin{align*}
+    x_{i+1} &= \frac{1}{a_{i+1,i+1}} \left[ b_{i+1} - \sum_{j=0}^{i} a_{ij} x_j \right]
+\end{align*}
+
+Then we know that $x_i = \frac{1}{a_{ii}} \left[ b_i - \sum_{j=0}^{i-1} a_{ij} x_j \right]$.
+
+Then we have found $x$.
+
+\section{Back Substitution}
+Let $A \in \mathbb{R}^{n \times n}$ be upper triangular such that
+\begin{align*}
+    A &= \begin{bmatrix}
+        a_{0,0} & a_{0,1} & \cdots & a_{0,n-1} \\
+        0 & a_{1,1} & \cdots & a_{1,n-1} \\
+        \vdots & \vdots & \ddots & \vdots \\
+        0 & 0 & 0 & a_{n-1,n-1}
+    \end{bmatrix}
+\end{align*}
+
+This means that for $i = \{0, 1, \ldots, n-1 \}$
+\begin{align*}
+    \sum_{j=i}^{n-1} a_{i,j} x_j &= b_i
+\end{align*}
+
+Then we have
+\begin{align*}
+    x_{n-1} &= \frac{1}{a_{n-1,n-1}} b_{n-1} \\
+    x_i &= \frac{1}{a_{i,i}} \left[ b_i - \sum_{j=i+1}^{n-1} a_{i,j} x_j \right]
+\end{align*}
+Starting from $x_{n-1}$ and working our way down to $x_0$.
+
+\section{Cholesky Decomposition}
+Let $A \in \mathbb{F}^{n \times n}, A > 0$.
+Then we seek to compute $A = LL^\mathrm{H}$ where $L$ is a lower triangular matrix. Note that $A = A^\mathrm{H}$.
+
+Then we have
+\begin{align*}
+    \begin{bmatrix}
+        l_{0,0} & 0 & \cdots & 0 \\
+        l_{1,0} & l_{1,1} & \cdots & 0 \\
+        \vdots & \vdots & \ddots & \vdots \\
+        l_{n-1,0} & l_{n-1,1} & \cdots & l_{n-1,n-1}
+    \end{bmatrix} \begin{bmatrix}
+        l_{0,0} & l_{1,0} & \cdots & l_{n-1,0} \\
+        0 & l_{1,1} & \cdots & l_{n-1,1} \\
+        \vdots & \vdots & \ddots & \vdots \\
+        0 & 0 & \cdots & l_{n-1,n-1}
+    \end{bmatrix} &= \begin{bmatrix}
+        a_{0,0} & a_{0,1} & \cdots & a_{0,n-1} \\
+        a_{0,1} & a_{1,1} & \cdots & a_{1,n-1} \\
+        \vdots & \vdots & \ddots & \vdots \\
+        a_{0,n-1} & a_{1,n-1} & \cdots & a_{n-1,n-1}
+    \end{bmatrix}
+\end{align*}
+
+We see that
+\begin{align*}
+    a_{i,j} &= \sum_{k=0}^{n-1} l_{i,k} l_{j,k} \\
+    &= \sum_{k=0}^{\min(i,j)} l_{i,k} l_{j,k} \\
+    a_{i,i} &= \sum_{k=0}^{n-1} l_{i,i}^2
+\end{align*}
+
+From the first row of $A$, we have
+\begin{align*}
+    l_{0,0}^2 &= a_{0,0} \\
+    l_{0,0} l_{1,0} &= a_{0,1} \\
+    \vdots &= \vdots \\
+    l_{0,0} l_{n-1,0} &= a_{0,n-1} \\
+\end{align*}
+From the second row of $A$, we have
+\begin{align*}
+    l_{1,0} l_{0,0} &= a_{0,1} \\
+    l_{1,0}^2 + l_{1,1}^2 &= a_{1,1} \\
+    \vdots &= \vdots \\
+    l_{1,0} l_{n-1,0} + l_{1,1} l_{n-1,1} &= a_{1,n-1} \\
+\end{align*}
+
+\section{QR Decomposition}
+
+Note that any matrix up to pivots can be decomposed into 
+
+$A = QR = \hat{Q} \hat{R}$.
+
+\begin{align*}
+    R &= \begin{bmatrix}
+        \hat{R} \\
+        0
+    \end{bmatrix}
+\end{align*}
+
+Then we have that
+\begin{align*}
+    R^\mathrm{T} R &= \begin{bmatrix}
+        \hat{R}^\mathrm{T} & 0^\mathrm{T}
+    \end{bmatrix} \begin{bmatrix}
+        \hat{R} \\
+        0
+    \end{bmatrix} \\
+    &= \hat{R}^\mathrm{T} \hat{R} + 0^\mathrm{T} 0 \\
+    &= \hat{R}^\mathrm{T} \hat{R}
+\end{align*}
+
+\section{Singular Value Decomposition}
+
+Let $A \in \mathbb{F}^{m \times n}, m >= n$ have rank $r$.
+Then we have
+\begin{align*}
+    A &= U \Sigma V^\mathrm{H} \\
+    &= \begin{bmatrix}
+        U_1 & U_2
+    \end{bmatrix} \begin{bmatrix}
+        \Sigma_1 & 0 \\
+        0 & 0
+    \end{bmatrix} \begin{bmatrix}
+        V_1^\mathrm{H} \\
+        V_2^\mathrm{H}
+    \end{bmatrix} \\
+    &= U_1 \Sigma_1 V_1^\mathrm{H}
+\end{align*}
+
+Where 
+\begin{align*}
+    U &\in \mathbb{F}^{m \times m}, & U^\mathrm{H} U = I_m \\
+    \Sigma &\in \mathbb{F}^{m \times n}, & \sigma_{ij} \in \{ \mathbb{R}^+ \mathrm{if} i = j \And i \le n \mathrm{else} \{0\} \} \\
+    V &\in \mathbb{F}^{n \times n}, & V^\mathrm{H} V = I_n \\
+    U_1 &\in \mathbb{F}^{m \times r} \\
+    U_2 &\in \mathbb{F}^{m \times (m-r)} \\
+    \Sigma_1 &\in \mathbb{F}^{r \times r} \\
+    V_1 &\in \mathbb{F}^{n \times r} \\
+    V_2 &\in \mathbb{F}^{n \times (n - r)}
+\end{align*}
+
+We form this matrix from the eigenvalue decomposition of $A^\mathrm{H} A$.
+
+Note t
+
+We know that we have $A = U \Sigma V^\mathrm{H}$ with $U^\mathrm{H} U = I_m, V^\mathrm{H} V = I_n$.
+
+$U \in \mathbb{F}^{m \times m}, \Sigma \in \mathbb{F}^{m \times n}, V \in \mathbb{F}^{n \times n}$.
+
+Then we have
+\begin{align*}
+    U &= \begin{bmatrix}
+        \hat{U} & \tilde{U}
+    \end{bmatrix}, \hat{U}_{m \times n}, \tilde{U}_{m \times (m - n)} \\
+    \Sigma &= \begin{bmatrix}
+        \hat{\Sigma} \\
+        0_{(m-n) \times n}
+    \end{bmatrix}
+\end{align*}
+
+\begin{align*}
+    A &= U \Sigma V^\mathrm{H} \\
+    &= \hat{U} \hat{\Sigma} V^\mathrm{H}
+\end{align*}
+
+Then we have the following:
+\begin{align*}
+    \Sigma V^\mathrm{H} &= \begin{bmatrix}
+        \hat{\Sigma} \\
+        0_{(m-n) \times n}
+    \end{bmatrix} V^\mathrm{H} \\
+    &= \begin{bmatrix}
+        \hat{\Sigma} V^\mathrm{H} \\
+        0_{(m-n) \times n}
+    \end{bmatrix}
+\end{align*}
+
+Now note that 
+
+\section{Homogeneous Matrix Equation}
+
+We wish to solve the homogeneous matrix equation
+\begin{align*}
+    A &\in \mathbb{R}^{m \times n} \\
+    x &\in \mathbb{R}^n \\
+    A x &= 0 \\
+    || x ||^2 &\ne 0
+\end{align*}
+
+In most cases, finding such a $x$ is impossible due to noise, so we instead settle for the following optimization problem.
+\begin{align*}
+    \min_x & \frac{1}{2} x^\mathrm{T} A^\mathrm{T} A x \\
+    x^\mathrm{T} x &= 1
+\end{align*}
+
+Then we form the augmented lagrangian
+\begin{align*}
+    \mathcal{L}(x, \lambda) &= \frac{1}{2} x^\mathrm{T} A^\mathrm{T} A x + \lambda (x^\mathrm{T} x - 1)
+\end{align*}
+
+Taking the derivative gives
+\begin{align*}
+    D \mathcal{L} &= \begin{bmatrix}
+        x^\mathrm{T} A^\mathrm{T} A + 2\lambda x^\mathrm{T} & x^\mathrm{T} x - 1
+    \end{bmatrix}
+\end{align*}
+
+Setting $D \mathcal{L} = 0$ gives
+\begin{align*}
+    \left(A^\mathrm{T} A + 2\lambda I \right) x &= 0 \\
+    x^\mathrm{T} x &= 1
+\end{align*}
+
+This is exactly Tikhanov regularization. Note however that this does not tell us explicitly what $\lambda$ is.
+
+Note further that
+\begin{align*}
+    A^\mathrm{T} A x &= - 2\lambda x
+\end{align*}
+
+Then we know that $\lambda = -2\sigma$, where $\sigma$ is an eigenvalue of $A^\mathrm{T} A$. This means that our optimization problem is non-convex, since these equations are satisfied for any eigenvalue of $A^\mathrm{T}A$.
+
+Further computing the Hessian $D^2 \mathcal{L}$ gives
+\begin{align*}
+    D^2 \mathcal{L} &= D \left[ D \mathcal{L} \right]^\mathrm{T} \\
+    &= D \begin{bmatrix}
+        \left( A^\mathrm{T} A + 2 \lambda I \right) x \\
+        x^\mathrm{T} x - 1
+    \end{bmatrix} \\
+    &= \begin{bmatrix}
+        A^\mathrm{T} A + 2 \lambda I & 2 x \\
+        2 x^\mathrm{T} & 0
+    \end{bmatrix}
+\end{align*}
+
+Then we can solve with an iterative method.
+
+\begin{align*}
+    \begin{bmatrix}
+        x_{k+1} \\
+        \lambda_{k+1}
+    \end{bmatrix} &= \begin{bmatrix}
+        x_k \\
+        \lambda_k
+    \end{bmatrix} - \left[D^2 \mathcal{L}\right]^{-1} D^\mathrm{T} \mathcal{L}
+\end{align*}
+
+Note, this is actually probably a horrible idea since there is no guarentee that we end up with the smallest value, rather just ending up with a different eigenvector.
+
+Also, our Hessian is not full rank, and so not invertible. So this approach does not work. Period.
+
+\section{Least Squares}
+
+The least-squares problem is the following
+
+\begin{align*}
+    \min_x || A x - b ||_2^2
+\end{align*}
+
+Note that 
+\begin{align*}
+    \min_x || A x - b ||_2^2 &= \min_x (A x - b)^\mathrm{T} (A x - b) \\
+    &= \min_x x^\mathrm{T} A^\mathrm{T} A x - 2b^\mathrm{T} A x + b^\mathrm{T} b \\
+    &= \min_x \frac{1}{2} x^\mathrm{T} A^\mathrm{T} A x - b^\mathrm{T} A x \\
+    &= \min_x J(x)
+\end{align*}
+
+Now, we have
+\begin{align*}
+    DJ(x) &= x^\mathrm{T}A^\mathrm{T} A - b^\mathrm{T} A
+\end{align*}
+
+Setting $DJ = 0$, we have
+\begin{align*}
+    0 &= x^\mathrm{T}A^\mathrm{T} A - b^\mathrm{T} A \\
+    x^\mathrm{T} A^\mathrm{T} A &= b^\mathrm{T} A \\
+    A^\mathrm{T} A x &= A^\mathrm{T} b
+\end{align*}
+
+Analyzing the second derivative, we have
+\begin{align*}
+    D^2 J &= D \left[ A^\mathrm{T} A x - A^\mathrm{T} b \right] \\
+    &= A^\mathrm{T} A
+\end{align*}
+
+Then when $A^\mathrm{T} A > 0$, we know that we have found the solution $x = (A^\mathrm{T} A)^{-1} A^\mathrm{T} b$
+
+\subsection{Leveraging Cholesky}
+
+This is the fastest method. Solve the equation $A^\mathrm{T} A x = A^\mathrm{T} b$.
+
+\subsection{Leveraging QR}
+Now, suppose $A = QR$.
+Then
+\begin{align*}
+    A^\mathrm{T} A x &= A^\mathrm{T} b \\
+    R^\mathrm{T} Q^\mathrm{T} Q R x &= A^\mathrm{T} b \\
+    R^\mathrm{T} R x &= A^\mathrm{T} b
+\end{align*}
+
+Since for QR, we have $R^\mathrm{T} R = \hat{R}^\mathrm{T} \hat{R}$, then we don't need to the full QR decomposition.
+
+\begin{align*}
+    \hat{R}^\mathrm{T} \hat{R} x &= A^\mathrm{T} b
+\end{align*}
+
+Note that $\hat{R}^\mathrm{T}$ is lower triangular, while $\hat{R}$ is upper triangular. Thus, we proceed as follows:
+\begin{enumerate}
+    \item Solve $\hat{R}^\mathrm{T} y = A^\mathrm{T} b$ for y using forward substitution.
+    \item Solve $\hat{R} x = y$ using back substitution.
+\end{enumerate}
+
+\subsection{Leveraging SVD}
+Now, let $A = U \Sigma V^\mathrm{T}$. Then
+\begin{align*}
+    A^\mathrm{T} A x &= A^\mathrm{T} b \\
+    V \Sigma U^\mathrm{T} U \Sigma V^\mathrm{T} x &= A^\mathrm{T} b \\
+    V \Sigma^2 V^\mathrm{T} x &= A^\mathrm{T} b \\
+    \begin{bmatrix}
+        \hat{V} \hat{\Sigma} & 0
+    \end{bmatrix} \begin{bmatrix}
+        \hat{\Sigma} \hat{V}^\mathrm{T} \\
+        0
+    \end{bmatrix} x &= A^\mathrm{T} b \\
+    \hat{V} \hat{\Sigma}^2 \hat{V}^\mathrm{T} x &= A^\mathrm{T} b
+\end{align*}
+
+\end{document}
