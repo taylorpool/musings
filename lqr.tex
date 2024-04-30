@@ -11,57 +11,57 @@
 \maketitle
 
 \begin{align*}
-    k &\in \{ 0, \ldots, t \} \\
-    x_k &\in \mathbb{R}^n \\
-    u_k &\in \mathbb{R}^m \\
-    A_k &\in \mathbb{R}^{n \times n} \\
-    B_k &\in \mathbb{R}^{n \times m} \\
-    x_{k+1} &= A_k x_k + B_k u_k \\
-    v_k &= \begin{bmatrix}
-        x_k \\
-        u_k
-    \end{bmatrix} \\
-    Q_k &= \begin{bmatrix}
-        Q_k^{xx} & Q_k^{xu} \\
-        {Q_k^{xu}}^\mathrm{T} & Q_k^{uu}
-    \end{bmatrix} \\
-    J^t &= \sum_{k=0}^{t-1} \left[ \frac{1}{2} v_k^\mathrm{T} Q_k v_k + q_k^\mathrm{T} v_k \right] + \frac{1}{2} x_t^\mathrm{T} Q_t^{xx} x_t + {q_t^x}^\mathrm{T} x_t
+	k       & \in \{ 0, \ldots, t \}                                                                                                                                       \\
+	x_k     & \in \mathbb{R}^n                                                                                                                                             \\
+	u_k     & \in \mathbb{R}^m                                                                                                                                             \\
+	A_k     & \in \mathbb{R}^{n \times n}                                                                                                                                  \\
+	B_k     & \in \mathbb{R}^{n \times m}                                                                                                                                  \\
+	x_{k+1} & = A_k x_k + B_k u_k                                                                                                                                          \\
+	v_k     & = \begin{bmatrix}
+		            x_k \\
+		            u_k
+	            \end{bmatrix}                                                                                                                                             \\
+	Q_k     & = \begin{bmatrix}
+		            Q_k^{xx}              & Q_k^{xu} \\
+		            {Q_k^{xu}}^\mathrm{T} & Q_k^{uu}
+	            \end{bmatrix}                                                                                                                           \\
+	J^t     & = \sum_{k=0}^{t-1} \left[ \frac{1}{2} v_k^\mathrm{T} Q_k v_k + q_k^\mathrm{T} v_k \right] + \frac{1}{2} x_t^\mathrm{T} Q_t^{xx} x_t + {q_t^x}^\mathrm{T} x_t
 \end{align*}
 
 We note the following dynamic property of $J^t$.
 
 \begin{align*}
-    J^t &= \sum_{k=0}^{t-1} \left[ \frac{1}{2} v_k^\mathrm{T} Q_k v_k + q_k^\mathrm{T} v_k \right] + \frac{1}{2} x_t^\mathrm{T} Q_t^{xx} x_t + {q_t^x}^\mathrm{T} x_t \\
-    &= \sum_{k=0}^{t-2} \left[ \frac{1}{2} v_k^\mathrm{T} Q_k v_k + q_k^\mathrm{T} v_k \right] + \frac{1}{2} v_{t-1}^\mathrm{T} Q_{t-1} v_{t-1} + q_{t-1}^\mathrm{T} v_{t-1} + \frac{1}{2} x_t^\mathrm{T} Q_t^{xx} x_t + {q_t^x}^\mathrm{T} x_t \\
-    &= \sum_{k=0}^{t-2} \left[ \frac{1}{2} v_k^\mathrm{T} Q_k v_k + q_k^\mathrm{T} v_k \right] + \frac{1}{2} x_{t-1}^\mathrm{T} Q_{t-1}^{xx} x_{t-1} + {q_{t-1}^x}^\mathrm{T} x_{t-1} \\
-    &+ \frac{1}{2} u_{t-1}^\mathrm{T} Q_{t-1}^{uu} u_{t-1} + {q_{t-1}^u}^\mathrm{T} u_{t-1}  + x_{t-1}^\mathrm{T} Q_{t-1}^{xu} u_{t-1} + \frac{1}{2} x_t^\mathrm{T} Q_t^{xx} x_t + {q_t^x}^\mathrm{T} x_t \\
-    &= J^{t-1} + \frac{1}{2} u_{t-1}^\mathrm{T} Q_{t-1}^{uu} u_{t-1} + {q_{t-1}^u}^\mathrm{T} u_{t-1}  + x_{t-1}^\mathrm{T} Q_{t-1}^{xu} u_{t-1} + \frac{1}{2} x_t^\mathrm{T} Q_t^{xx} x_t + {q_t^x}^\mathrm{T} x_t \\
-    &= J^{t-1} + \frac{1}{2} u_{t-1}^\mathrm{T} Q_{t-1}^{uu} u_{t-1} + {q_{t-1}^u}^\mathrm{T} u_{t-1}  + x_{t-1}^\mathrm{T} Q_{t-1}^{xu} u_{t-1} \\
-    &+ \frac{1}{2} \left( A_{t-1} x_{t-1} + B_{t-1} u_{t-1} \right)^\mathrm{T} Q_t^{xx} \left( A_{t-1} x_{t-1} + B_{t-1} u_{t-1} \right)\\
-    &+ {q_t^x}^\mathrm{T} \left( A_{t-1} x_{t-1} + B_{t-1} u_{t-1} \right) \\
-    &= J^{t-1} + \frac{1}{2} u_{t-1}^\mathrm{T} Q_{t-1}^{uu} u_{t-1} + {q_{t-1}^u}^\mathrm{T} u_{t-1}  + x_{t-1}^\mathrm{T} Q_{t-1}^{xu} u_{t-1} \\
-    &+ \frac{1}{2} x_{t-1}^\mathrm{T} A_{t-1}^\mathrm{T} Q_t^{xx} A_{t-1} x_{t-1} + x_{t-1}^\mathrm{T} A_{t-1}^\mathrm{T} Q_t^{xx} B_{t-1} u_{t-1}\\
-    &+ \frac{1}{2} u_{t-1}^\mathrm{T} B_{t-1}^\mathrm{T} Q_t^{xx} B_{t-1} u_{t-1} + {q_t^x}^\mathrm{T} \left( A_{t-1} x_{t-1} + B_{t-1} u_{t-1} \right) \\
+	J^t & = \sum_{k=0}^{t-1} \left[ \frac{1}{2} v_k^\mathrm{T} Q_k v_k + q_k^\mathrm{T} v_k \right] + \frac{1}{2} x_t^\mathrm{T} Q_t^{xx} x_t + {q_t^x}^\mathrm{T} x_t                                                                               \\
+	    & = \sum_{k=0}^{t-2} \left[ \frac{1}{2} v_k^\mathrm{T} Q_k v_k + q_k^\mathrm{T} v_k \right] + \frac{1}{2} v_{t-1}^\mathrm{T} Q_{t-1} v_{t-1} + q_{t-1}^\mathrm{T} v_{t-1} + \frac{1}{2} x_t^\mathrm{T} Q_t^{xx} x_t + {q_t^x}^\mathrm{T} x_t \\
+	    & = \sum_{k=0}^{t-2} \left[ \frac{1}{2} v_k^\mathrm{T} Q_k v_k + q_k^\mathrm{T} v_k \right] + \frac{1}{2} x_{t-1}^\mathrm{T} Q_{t-1}^{xx} x_{t-1} + {q_{t-1}^x}^\mathrm{T} x_{t-1}                                                           \\
+	    & + \frac{1}{2} u_{t-1}^\mathrm{T} Q_{t-1}^{uu} u_{t-1} + {q_{t-1}^u}^\mathrm{T} u_{t-1}  + x_{t-1}^\mathrm{T} Q_{t-1}^{xu} u_{t-1} + \frac{1}{2} x_t^\mathrm{T} Q_t^{xx} x_t + {q_t^x}^\mathrm{T} x_t                                       \\
+	    & = J^{t-1} + \frac{1}{2} u_{t-1}^\mathrm{T} Q_{t-1}^{uu} u_{t-1} + {q_{t-1}^u}^\mathrm{T} u_{t-1}  + x_{t-1}^\mathrm{T} Q_{t-1}^{xu} u_{t-1} + \frac{1}{2} x_t^\mathrm{T} Q_t^{xx} x_t + {q_t^x}^\mathrm{T} x_t                             \\
+	    & = J^{t-1} + \frac{1}{2} u_{t-1}^\mathrm{T} Q_{t-1}^{uu} u_{t-1} + {q_{t-1}^u}^\mathrm{T} u_{t-1}  + x_{t-1}^\mathrm{T} Q_{t-1}^{xu} u_{t-1}                                                                                                \\
+	    & + \frac{1}{2} \left( A_{t-1} x_{t-1} + B_{t-1} u_{t-1} \right)^\mathrm{T} Q_t^{xx} \left( A_{t-1} x_{t-1} + B_{t-1} u_{t-1} \right)                                                                                                        \\
+	    & + {q_t^x}^\mathrm{T} \left( A_{t-1} x_{t-1} + B_{t-1} u_{t-1} \right)                                                                                                                                                                      \\
+	    & = J^{t-1} + \frac{1}{2} u_{t-1}^\mathrm{T} Q_{t-1}^{uu} u_{t-1} + {q_{t-1}^u}^\mathrm{T} u_{t-1}  + x_{t-1}^\mathrm{T} Q_{t-1}^{xu} u_{t-1}                                                                                                \\
+	    & + \frac{1}{2} x_{t-1}^\mathrm{T} A_{t-1}^\mathrm{T} Q_t^{xx} A_{t-1} x_{t-1} + x_{t-1}^\mathrm{T} A_{t-1}^\mathrm{T} Q_t^{xx} B_{t-1} u_{t-1}                                                                                              \\
+	    & + \frac{1}{2} u_{t-1}^\mathrm{T} B_{t-1}^\mathrm{T} Q_t^{xx} B_{t-1} u_{t-1} + {q_t^x}^\mathrm{T} \left( A_{t-1} x_{t-1} + B_{t-1} u_{t-1} \right)                                                                                         \\
 \end{align*}
 
 We wish to minimize $J^t$ with respect to $u = \begin{bmatrix}
-    u_0^\mathrm{T} &
-    u_1^\mathrm{T} &
-    \cdots &
-    u_{t-1}^\mathrm{T}
-\end{bmatrix}^\mathrm{T} $
+		u_0^\mathrm{T} &
+		u_1^\mathrm{T} &
+		\cdots         &
+		u_{t-1}^\mathrm{T}
+	\end{bmatrix}^\mathrm{T} $
 
 Using the Bellman optimality principle, we first minimize $J^t$ with respect to $u_{t-1}$.
 
 \begin{align*}
-    D_{u_{t-1}} J^t &= u_{t-1}^\mathrm{T} Q_{t-1}^{uu} + {q_{t-1}^u}^\mathrm{T} + x_{t-1}^\mathrm{T} Q_{t-1}^{xu} + x_{t-1}^\mathrm{T} A_{t-1}^\mathrm{T} Q_t^{xx} B_{t-1}\\
-    &+ u_{t-1}^\mathrm{T} B_{t-1}^\mathrm{T} Q_t^{xx} B_{t-1} + {q_t^x}^\mathrm{T} B_{t-1} \\
+	D_{u_{t-1}} J^t & = u_{t-1}^\mathrm{T} Q_{t-1}^{uu} + {q_{t-1}^u}^\mathrm{T} + x_{t-1}^\mathrm{T} Q_{t-1}^{xu} + x_{t-1}^\mathrm{T} A_{t-1}^\mathrm{T} Q_t^{xx} B_{t-1} \\
+	                & + u_{t-1}^\mathrm{T} B_{t-1}^\mathrm{T} Q_t^{xx} B_{t-1} + {q_t^x}^\mathrm{T} B_{t-1}                                                                 \\
 \end{align*}
 
 Setting $D_{u_{t-1}} J^t = 0$ and solving for $u_{t-1}$ gives
 \begin{align*}
-    u_{t-1}^\star &= -\left(Q_{t-1}^{uu} + B_{t-1}^\mathrm{T} Q_t^{xx} B_{t-1} \right)^{-1} \left( q_{t-1}^u + {Q_{t-1}^{xu}}^\mathrm{T} x_{t-1} + B_{t-1}^\mathrm{T} Q_t^{xx} A_{t-1} x_{t-1} + B_{t-1}^\mathrm{T} {q_t^x}^\mathrm{T} \right) \\
-    &= P_{t-1}^\mathrm{-1} G_{t-1}(x_{t-1}) \\
+	u_{t-1}^\star & = -\left(Q_{t-1}^{uu} + B_{t-1}^\mathrm{T} Q_t^{xx} B_{t-1} \right)^{-1} \left( q_{t-1}^u + {Q_{t-1}^{xu}}^\mathrm{T} x_{t-1} + B_{t-1}^\mathrm{T} Q_t^{xx} A_{t-1} x_{t-1} + B_{t-1}^\mathrm{T} {q_t^x}^\mathrm{T} \right) \\
+	              & = P_{t-1}^\mathrm{-1} G_{t-1}(x_{t-1})                                                                                                                                                                                      \\
 \end{align*}
 
 Then we have found the first action that works.

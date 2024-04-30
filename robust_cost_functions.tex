@@ -1,0 +1,135 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\newcommand{\T}{\mathrm{T}}
+
+\title{Robust Cost Functions}
+\author{Taylor Pool}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+Consider the following nonlinear least squares problem.
+Let $m = \dim{\mathcal{X}}$.
+Let $f: \mathcal{X} \rightarrow \mathbb{R}$.
+
+\begin{equation}
+	\min_x f(x) \\
+\end{equation}
+
+Where with $r_i: \mathcal{X} \rightarrow \mathbb{R}^{m_i}$
+\begin{equation}
+	f(x) = \frac{1}{2} \sum_{i=1}^n r_i^\T \left( x \right) r_i \left( x \right)
+\end{equation}
+
+And
+\begin{equation}
+	Df(x) = \sum_{i=1}^n r_i^\T \left( x \right) Dr_i \left( x  \right)
+\end{equation}
+with $Df: \mathcal{X} \rightarrow \mathbb{R}^{1 \times m}$.
+And $Dr_i: \mathcal{X} \rightarrow \mathbb{R}^{m_i \times m}$.
+
+Unfortunately, this formulation gives a lot of weight to large values of $r_i^\T r_i$.
+
+\section{Robust Cost Functions}
+
+We can make the problem less susceptible to outliers by making large values of $r_i^\T r_i$ smaller.
+
+The robust cost function is the following:
+
+\begin{equation}
+	f(x) = \sum_{i=1}^n \rho\left( \frac{1}{2} r_i^\T \left( x \right) r_i \left( x \right) \right)
+\end{equation}
+
+Then
+\begin{equation}
+	Df(x) = \sum_{i=1}^n D\rho\left( \frac{1}{2} r_i^\T \left( x \right) r_i \left( x \right) \right) r_i^\T \left( x \right) Dr_i \left( x \right)
+\end{equation}
+
+Each robust cost function $\rho: \mathbb{R}_+ \rightarrow \mathbb{R}_+$
+
+\section{Cauchy}
+
+This is an infinite growth function, $\kappa > 0$.
+
+\begin{equation}
+	\rho(y) = \log{\left( \frac{y + \kappa}{\kappa} \right)}
+\end{equation}
+
+\begin{equation}
+	D\rho(y) = \frac{1}{y + \kappa}
+\end{equation}
+
+\begin{equation}
+	D^2 \rho(y) = -\frac{1}{(y + \kappa)^2}
+\end{equation}
+
+\section{Welsch}
+
+This is a bounded function, $\kappa > 0$.
+
+\begin{equation}
+	\rho(y) = 1 - \exp{ \left(-\frac{y}{\kappa} \right)}
+\end{equation}
+
+\begin{equation}
+	D\rho(y) = \frac{1}{\kappa} \exp{ \left( -\frac{y}{\kappa} \right)}
+\end{equation}
+
+\begin{equation}
+	D^2 \rho(y) = -\frac{1}{\kappa^2} \exp{ \left( -\frac{y}{\kappa} \right) }
+\end{equation}
+
+\begin{equation}
+	\lim_{y \rightarrow \infty} \rho(y) = 1
+\end{equation}
+
+\section{Geman-McClure}
+
+This is a bounded function, $\kappa > 0$.
+
+\begin{equation}
+	\rho \left( y \right) = \frac{1}{y + \kappa} y
+\end{equation}
+
+\begin{equation}
+	D\rho \left( y \right) = \frac{\kappa}{ \left( y + \kappa \right)^2 }
+\end{equation}
+
+\begin{equation}
+	D^2 \rho (y) = -\frac{2 \kappa}{(y + \kappa)^3}
+\end{equation}
+
+\begin{equation}
+	\lim_{y \rightarrow \infty} \rho(y) = 1
+\end{equation}
+
+\section{Applications to Nonlinear Least Squares}
+
+\begin{align}
+	f(x)   & = \sum_{i=1}^n \rho_i(y_i(x))  \\
+	y_i(x) & = \frac{1}{2} r_i^\T(x) r_i(x) \\
+\end{align}
+
+\begin{align}
+	Df(x)      & = \sum_{i=1}^n D \rho_i(y_i(x)) \ Dy_i(x) \\
+	Dy_i(x)    & = r_i^\T (x) Dr_i(x)                      \\
+	D^2 y_i(x) & \approx D^\T r_i(x) Dr_i(x)
+\end{align}
+
+\begin{align}
+	D^2 f(x) & =  D \left[ D^\T f \right](x)                                                                                     \\
+	         & = D \left[ \sum_{i=1}^n D^\T y_i(x) D \rho_i(y_i(x)) \right]                                                      \\
+	         & = \sum_{i=1}^n D \left[ D^\T y_i(x) D \rho_i(y_i(x)) \right]                                                      \\
+	         & = \sum_{i=1}^n \left[ D^2 y_i(x) D \rho_i(y_i(x)) + D^\T y_i(x) D^2 \rho_i(y_i(x)) Dy_i(x) \right]                \\
+	         & \approx \sum_{i=1}^n \left[ D^\T r_i(x) Dr_i(x) D \rho_i(y_i(x)) + D^\T y_i(x) D^2 \rho_i(y_i(x)) Dy_i(x) \right] \\
+	         & = \sum_{i=1}^n \left[ D\rho_i D^\T r_i Dr_i + D^2 \rho_i D^\T y_i Dy_i \right]
+\end{align}
+
+\end{document}
