@@ -1,0 +1,45 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\title{Rotation Onto A Plane}
+
+\author{Taylor Pool}
+
+\begin{document}
+
+\maketitle
+
+Let $x \in \mathbb{F}^n$.
+
+Now let $w \in \mathbb{F}^n, || w ||_2 = 1$ be the unit normal vector of a plane $W$ through the origin.
+
+Define $\mathrm{normalized}(z) = \frac{z}{||z||}$.
+
+Let $y = \mathrm{normalized}(\mathrm{proj}_W x) || x ||$ be the projection of $x$ onto $W$, scaled to be the same magnitude as $x$.
+
+Then we seek to find a right-handed rotation $R$ such that $y = Rx$.
+
+Note that $y = \mathrm{normalized}(x - (w^\mathrm{H} x) w) || x ||_2$.
+
+Then we have $\cos{\theta} = \frac{x^\mathrm{H} y}{|| x ||^2_2} = \frac{x^\mathrm{H} \mathrm{normalized}(y)}{ || x ||_2 }$.
+
+And we have $n \sin{\theta} = \frac{x \times y}{|| x ||^2_2} = \frac{x \times \mathrm{normalized}(y)}{ || x ||_2 }$, where $n$ is the axis of rotation.
+
+Then our rotation in quaternion form is given by $\begin{bmatrix} \cos{\theta} & n^T \sin{\theta} \end{bmatrix}$
+
+In rotation matrix form, it is given by
+
+\begin{align*}
+	y & = || x ||_2 \mathrm{normalized}( x - (w^\mathrm{H} x) w)                              \\
+	  & = || x ||_2 \frac{ x - (w^\mathrm{H} x) w}{ || x - (w^\mathrm{H} x) w ||_2}           \\
+	  & = || x ||_2 \frac{ x - w (w^\mathrm{H} x)  }{ || x - w (w^\mathrm{H} x) ||_2}         \\
+	  & = || x ||_2 \frac{ ( I - w w^\mathrm{H} ) x }{ || (I - w w^\mathrm{H} ) x ||_2 }      \\
+	  & = || x ||_2 \frac{ ( I - w w^\mathrm{H} ) x }{ || I - w w^\mathrm{H} ||_2 || x ||_2 } \\
+	  & = \frac{ ( I - w w^\mathrm{H} ) }{ || I - w w^\mathrm{H} ||_2 } x                     \\
+	  & = ( I - w w^\mathrm{H} ) x
+\end{align*}
+
+
+\end{document}
