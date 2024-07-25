@@ -1,0 +1,109 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{IEEEtrantools}
+\usepackage{hyperref}
+
+\newcommand{\transpose}[1]{#1^\mathrm{T}}
+
+\title{Rotation Between Two Vectors in $\mathbb{R}^3$}
+\author{Taylor Pool}
+
+\begin{document}
+\maketitle
+
+\section{Problem Statement}
+
+Let $a, b \in \mathbb{R}^3$ be unit vectors.
+Find a rotation ${^a R_b}$ such that
+\begin{IEEEeqnarray}{lCl}
+    b & = & {^b R_a} \odot a
+\end{IEEEeqnarray}
+
+\section{Solution}
+\label{solution}
+
+First, compute the inner product between $a$ and $b$:
+\begin{IEEEeqnarray}{lCl}
+    \cos{\theta} & = & a \cdot b
+\end{IEEEeqnarray}
+
+\subsection{Non-opposite Case}
+\label{non-opposite-case}
+
+Now, if for some $\epsilon > 0$,
+\begin{IEEEeqnarray}{lCl}
+    \cos{\theta} & >= & \epsilon - 1
+\end{IEEEeqnarray}
+Then this means that the two vectors are sufficiently non-opposite.
+We can then compute the cross product from $a$ to $b$ as
+\begin{IEEEeqnarray}{lCl}
+    \omega \sin{\theta} & = & a \times b
+\end{IEEEeqnarray}
+Now, from the double angle identities, we have
+\begin{IEEEeqnarray}{lCl}
+    \label{sqrt-eqn}
+    \cos{\frac{\theta}{2}} & = & \sqrt{\frac{\cos{\theta} + 1}{2}} \\
+    \omega \sin{\frac{\theta}{2}} & = & \omega \sin{\theta} \frac{1}{2 \cos{\frac{\theta}{2}}}
+\end{IEEEeqnarray}
+Then we may express ${^b R_a}$ as a quaternion:
+\begin{IEEEeqnarray}{lCl}
+    {^b R_a} & = & \begin{bmatrix}
+        \cos{\frac{\theta}{2}} \\
+        \omega \sin{\frac{\theta}{2}}
+    \end{bmatrix}
+\end{IEEEeqnarray}
+
+\subsection{Opposite Case}
+Suppose now that for $\epsilon > 0$,
+\begin{IEEEeqnarray}{lCl}
+    \cos{\theta} & < & \epsilon - 1
+\end{IEEEeqnarray}
+
+In this case, $a$ and $b$ are pointing in opposite directions, which has direct numerical stability issues,
+since the cross product between two parallel vectors is the zero vector.
+To solve this issue, we compute an intermediate rotation $^c R_a$ of $\pi$ radians about an axis perpendicular to $a$.
+
+\subsubsection{Finding the axis}
+We select the index, $i$ of $a$ with the minimum absolute value.
+\begin{IEEEeqnarray}{lCl}
+    i & = & \arg \min_j | a_j |
+\end{IEEEeqnarray}
+Then we compute our axis of rotation, $\mu$ as
+\begin{IEEEeqnarray}{lCl}
+    \mu & = & \mathrm{normalized}(e_i - a a_i)
+\end{IEEEeqnarray}
+where $e_i$ is the unit vector with 1 as the $i$-th element.
+
+\subsubsection{Defining the Intermediate Rotation}
+Then we may define $^c R_a$ in terms of a quaternion as:
+\begin{IEEEeqnarray}{lCl}
+    {^c R_a} & = & \begin{bmatrix}
+        0 \\
+        \mu
+    \end{bmatrix}
+\end{IEEEeqnarray}
+
+\subsubsection{Final Solution}
+Now, let $c = {^c R_a} \odot a$, and we may find ${^b R_c}$ via the method proposed in Section \ref{non-opposite-case}.
+Finally
+\begin{IEEEeqnarray}{lCl}
+    {^b R_a} & = & {^b R_c} \circ {^c R_a}
+\end{IEEEeqnarray}
+
+\section{Remarks}
+
+\subsection{Efficiency}
+The solution presented Section \ref{solution} is very efficient.
+Even though $\sin$ and $\cos$ terms appear, these quantities are calculated via
+the inner and cross products.
+The most expensive operation of the procedure is the square root in Equation \ref{sqrt-eqn}.
+
+\subsection{Inspiration}
+
+We take inspiration from Ethan Eade's approach, however Eade does not specify how to choose the axis of intermediate rotation, which
+is a nontrivial task.
+Furthermore, Eade's approach is in terms of rotation matrices. For more information, see \url{https://ethaneade.com/rot_between_vectors.pdf}.
+
+\end{document}
