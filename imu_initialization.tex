@@ -2,6 +2,7 @@
 
 \usepackage{amsmath}
 \usepackage{amsfonts}
+\usepackage{IEEEtrantools}
 
 \title{Attitude and IMU Bias Initialization}
 \author{Taylor Pool}
@@ -12,34 +13,65 @@
 \maketitle
 
 \section{Problem Statement}
+Let $w$ be the inertial frame.
+Let $r$ be the robot body frame aligned with the IMU. 
+Let $^w n$ be the normal force in the world frame.
 
-Let $w$ be the inertial frame. Let $r$ be the robot body frame aligned with the IMU. Let $^w n$ be the normal force in the world frame.
-Given IMU measurements $(^r \omega^k, ^r a^k)$, we seek to estimate
-
+Given IMU measurements $({^r \omega^k}, {^r a^k})$, we seek to estimate
 \begin{itemize}
-	\item Gyroscope bias $^r_\omega b$
-	\item Accelerometer bias $^r_a b$
-	\item Rotation of robot in world frame $^w R_r$
+	\item Gyroscope bias $b_\omega$
+	\item Accelerometer bias $b_a$
+	\item Rotation of robot in world frame ${^w R_r}$
 \end{itemize}
 
 \section{Gyroscope}
 
 We assume that the following relationship holds
 \begin{equation}
-	^r_\mathrm{true} \omega^k = ^r \omega^k + ^r_\omega b + \eta_\omega^k
+	{^r \omega^k} = {^r \tilde{\omega}^k} + {b_\omega} + {\eta_\omega^k}
 \end{equation}
 
-Where the bias is normally distributed as $^r_\omega b \sim \mathcal{N}(0, \Sigma_\omega)$,
-and the white noise is normally distributed as $\eta_\omega^k \sim \mathcal{N}(0, \Sigma_\eta)$.
-
-Next, we assume that in this case, the robot is stationary, so that $^r_\mathrm{true} \omega^k = 0$.
+Where the bias is normally distributed as $^r_\omega b \sim \mathcal{N}(0, \Sigma_\omega)$.
+Each white noise term $\eta_\omega^k$ is a sample of $\eta_\omega \sim \mathcal{N}(0,\Sigma_{\eta_\omega})$
+Next, we assume that in this case, the robot is stationary, so that ${^r \tilde{\omega}^k} = 0$.
 
 Now, we have
-\begin{equation}
-	^r_\omega b = -\mathbb{E}\left[^r \omega\right]
-\end{equation}
+\begin{IEEEeqnarray}{rCl}
+	{^r \omega^k} & = & {^r \tilde{\omega}^k} + {b_\omega} + {\eta_\omega^k} \\
+	{^r \omega^k} & = & {b_\omega} + {\eta_\omega^k} \\
+\end{IEEEeqnarray}
 
-\section{Accelerometer}
+Manipulating the equation yields for each sample while the robot is stationary:
+\begin{IEEEeqnarray}{c}
+	{b_\omega} = {^r \omega^k} - {\eta_\omega^k}
+\end{IEEEeqnarray}
+
+Computing the expectation of the righthand side gives
+\begin{IEEEeqnarray}{c}
+	\label{eqn:bias_gyro}
+	{b_\omega} = \mathbb{E}\left[ {^r \omega} \right]
+\end{IEEEeqnarray}
+
+Thus we have an expression for the bias of the gyroscope in Equation \ref{eqn:bias_gyro}.
+
+\section{Rotation and Accelerometer Bias}
+
+We seek to find ${^r R_w}, b_a$, where no yaw is present (does not make sense for an initialization).
+
+Now, we have the following model for the accelerometer:
+\begin{IEEEeqnarray}{c}
+	{^r a^k} = {^r \tilde{a}^k} - {^r R_w^k} {^w g} + b_a + \eta_a^k
+\end{IEEEeqnarray}
+
+Then we again assume that the robot is stationary:
+\begin{IEEEeqnarray}{c}
+	{^r a^k} = - {^r R_w^k} {^w g} + b_a + \eta_a^k
+\end{IEEEeqnarray}
+
+Thinking about the no-yaw constraint, this means that we need the gravity vector to live in the x-z plane.
+So this means that we first need to project the nominal world gravity vector onto the xz plane.
+
+In order to do this, we first assume that the 
 
 We first seek to solve the following problem
 

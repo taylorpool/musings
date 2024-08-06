@@ -1,0 +1,31 @@
+\documentclass{article}
+
+\usepackage{biblatex}
+
+\addbibresource{resources.bib}
+
+\title{Nearest Neighbor for Robotics}
+
+\author{Taylor Pool}
+
+\begin{document}
+\maketitle
+
+In robotics, nearest neighbor search is fundamentally important for procedures such as point cloud registration.
+However, in contrast with other fields, robotics needs the search index to update as quick as possible to ensure real time performance.
+
+There are two main approaches to doing so.
+
+\begin{enumerate}
+\item K-D Tree: This structure divides at a binary level all the way down
+\item Octree: This structure recursively subdivides into 8 children until a small enough group remains (which is stored in a list)
+\item Voxel Grid: This structure is not really great because it can introduce discretization errors.
+\end{enumerate}
+
+The issue with all of the above approaches is that they generally don't perform well in the incremental addition and deletion space.
+To this end, there have been papers such as the incremental kd tree \cite{cai_ikd-tree_2021} and the incremental octree \cite{zhu_i-octree_2024} that seek to rectify this issue.
+Both are probably satisfactory for the given problem space and should probably be used over other methods.
+
+\printbibliography
+
+\end{document}

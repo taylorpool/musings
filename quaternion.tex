@@ -5,8 +5,11 @@
 \usepackage{amssymb}
 \usepackage{bm}
 \usepackage{mathtools}
+\usepackage{IEEEtrantools}
 
 \newcommand{\transpose}[1]{#1^\mathrm{T}}
+\newcommand{\skewsym}[1]{\lfloor #1 \rfloor_\times}
+\newcommand{\norm}[1]{|| #1 ||}
 
 \title{Quaternion Notes}
 \author{Taylor Pool}
@@ -220,5 +223,72 @@ Then we have
         N\left( \prescript{c}{}{\pmb{q}}_b, \prescript{b}{}{t}_a \right) & I_3 & 0_{3 \times 4} & M\left( \prescript{c}{}{\pmb{q}}_b \right)
     \end{bmatrix}
 \end{align*}
+
+\section{Unit Quaternion Algebra}
+
+\begin{IEEEeqnarray}{lCl}
+    L(q) & = & \begin{bmatrix}
+        s & -\transpose{v} \\
+        v & sI + \skewsym{v}
+    \end{bmatrix}
+\end{IEEEeqnarray}
+
+\begin{IEEEeqnarray}{lCl}
+    R(q) & = & \begin{bmatrix}
+        s & -\transpose{v} \\
+        v & sI - \skewsym{v}
+    \end{bmatrix}
+\end{IEEEeqnarray}
+
+\begin{IEEEeqnarray}{lCl}
+    L(q^{-1}) & = & \transpose{L}(q) \\
+    R(q^{-1}) & = & \transpose{R}(q)
+\end{IEEEeqnarray}
+
+\begin{IEEEeqnarray}{lCl}
+    q_3 & = & q_1 \odot q_2 \\
+    & = & L(q_1) q_2 \\
+    & = & R(q_2) q_1
+\end{IEEEeqnarray}
+
+\section{Exponential Map}
+
+Let $\vec{\omega} = \omega \theta$. Where $\omega$ is a unit vector in $\mathbb{R}^3$.
+
+\begin{IEEEeqnarray}{lCl}
+    \mathrm{Exp}(\vec{\omega}) & = & \begin{bmatrix}
+        \cos{\frac{\theta}{2}} \\
+        \omega \sin{\frac{\theta}{2}}
+    \end{bmatrix}
+\end{IEEEeqnarray}
+
+To compute numerically given $\vec{\omega}$, first compute $\theta = \norm{\vec{\omega}}$.
+Then if $|\theta| < \epsilon$, then by L'Hopital's rule, we have
+\begin{IEEEeqnarray}{lCl}
+    \mathrm{Exp}(\vec{\omega}) & = & \mathrm{normalized} \begin{bmatrix}
+        \cos{\frac{\theta}{2}} \\
+        \frac{\vec{\omega}}{2}
+    \end{bmatrix}
+\end{IEEEeqnarray}
+Otherwise if $|\theta| \ge \epsilon$, then we have
+\begin{IEEEeqnarray}{lCl}
+    \mathrm{Exp}(\vec{\omega}) & = & \begin{bmatrix}
+        \cos{\frac{\theta}{2}} \\
+        \frac{\sin{\frac{\theta}{2}}}{\theta}\vec{\omega}
+    \end{bmatrix}
+\end{IEEEeqnarray}
+
+\section{Logarithmic Map}
+
+Note that
+\begin{IEEEeqnarray}{lCl}
+    q & = & \begin{bmatrix}
+        \cos{\frac{\theta}{2}} \\
+        \omega \sin{\frac{\theta}{2}}
+    \end{bmatrix}
+\end{IEEEeqnarray}
+
+We seek to find $\vec{\omega} = \omega \theta$.
+
 
 \end{document}

@@ -1,0 +1,68 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{IEEEtrantools}
+
+\title{Error Metrics For Quaternions}
+\author{Taylor Pool}
+
+\begin{document}
+\maketitle
+
+\section{Geometric Error}
+
+We note that the error between two rotations can be thought of as the angle between them.
+
+For a given two rotations $R_1, R_2$, we have
+\begin{IEEEeqnarray}{lCl}
+    R_1^{-1} R_2 & = & \begin{bmatrix}
+        \cos{\frac{\theta}{2}} \\
+        \omega \sin{\frac{\theta}{2}}
+    \end{bmatrix}
+\end{IEEEeqnarray}
+
+We have
+\begin{IEEEeqnarray}{lCl}
+    \theta & = & 2 \arccos{ | q_1^\mathrm{T} q_2 |}
+\end{IEEEeqnarray}
+
+\subsection{Relationship to Log}
+Note that $ || \omega || = 1$, so
+\begin{IEEEeqnarray}{lCl}
+    \mathrm{Log}\left( R_1^{-1} R_2 \right) & = & \omega \theta
+\end{IEEEeqnarray}
+
+But this is much more computationally intensive than the error metric described above.
+
+\subsection{Derivative}
+TODO, but need to show here that the derivative is undefined for $|q_1^\mathrm{T} q_2 | = 1$
+
+\section{Chordal Error}
+
+A simpler metric does away with $\arccos$ and scales by $\pi$:
+\begin{IEEEeqnarray}{lCl}
+    \theta & = & \pi \left( 1 - | q_1^\mathrm{T} q_2 | \right)
+\end{IEEEeqnarray}
+
+This metric contains the same maximum and minimum values as the geometric error, but is chordal,
+in that it directly operates on the inner product without a trigonometric transformation.
+
+\subsection{Derivative}
+TODO
+
+\section{L2 Chordal Error}
+
+Another metric uses L2 on the chordal error:
+\begin{IEEEeqnarray}{lCl}
+    \theta & = & \pi \left( 1 - (q_1^\mathrm{T} q_2 )^2 \right)
+\end{IEEEeqnarray}
+
+\section{L2 Geometric Error}
+
+\begin{IEEEeqnarray}{lCl}
+    \theta & = & 2 \arccos{ \left( \left( q_1^\mathrm{T} q_2 \right)^2 \right) }
+\end{IEEEeqnarray}
+
+
+\end{document}
