@@ -3,6 +3,7 @@
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
+\usepackage{algpseudocodex}
 \usepackage{bm}
 \usepackage{mathtools}
 \usepackage{IEEEtrantools}
@@ -10,6 +11,7 @@
 \newcommand{\transpose}[1]{#1^\mathrm{T}}
 \newcommand{\skewsym}[1]{\lfloor #1 \rfloor_\times}
 \newcommand{\norm}[1]{|| #1 ||}
+\newcommand{\sign}[1]{{\mathrm{sign}\left( #1 \right)}}
 
 \title{Quaternion Notes}
 \author{Taylor Pool}
@@ -21,42 +23,42 @@
 
 \section{Introduction}
 
-Quaternions are an important representation of orientation in robotics. They are defined as 
+Quaternions are an important representation of orientation in robotics. They are defined as
 
 Note that quaternions are vectors $\mathbb{R}^4$. They just have a special group operation overlayed on top of the vector space.
 
 Unit quaternions on the other hand are a \pmb{manifold} embedded in $\mathbb{R}^4$.
 
 \begin{align*}
-    q &= q_w + q_x i + q_y j + q_z k
+	q & = q_w + q_x i + q_y j + q_z k
 \end{align*}
 Or we also say a quaternion is
 \begin{align*}
-    \pmb{q} &= \begin{bmatrix}
-        q_w \\
-        q_x \\
-        q_y \\
-        q_z
-    \end{bmatrix} \\
-    q &= \begin{bmatrix}
-        1 & i & j & k
-    \end{bmatrix} \pmb{q}
+	\pmb{q} & = \begin{bmatrix}
+		            q_w \\
+		            q_x \\
+		            q_y \\
+		            q_z
+	            \end{bmatrix}        \\
+	q       & = \begin{bmatrix}
+		            1 & i & j & k
+	            \end{bmatrix} \pmb{q}
 \end{align*}
 
 Where
 \begin{align*}
-    ij &= k \\
-    jk &= i \\
-    i^2 &= j^2 = k^2 = -1 \\
+	ij  & = k              \\
+	jk  & = i              \\
+	i^2 & = j^2 = k^2 = -1 \\
 \end{align*}
 We can then derive
 \begin{align*}
-    ik &= -j
+	ik & = -j
 \end{align*}
 
 A special group is the group of unit quaternions such that
 \begin{align*}
-    || \pmb{q} || &= || \pmb{q} ||^2 = q_w^2 + q_x^2 + q_y^2 + q_z^2 = 1
+	|| \pmb{q} || & = || \pmb{q} ||^2 = q_w^2 + q_x^2 + q_y^2 + q_z^2 = 1
 \end{align*}
 
 Suppose we have a quaternion $\pmb{q} \ne \pmb{0}$. We wish to find $\Delta \pmb{q}$ such that $\pmb{q} + \Delta \pmb{q} $ is a unit quaternion, while minimizing $||\Delta \pmb{q}||^2$
@@ -64,191 +66,191 @@ Suppose we have a quaternion $\pmb{q} \ne \pmb{0}$. We wish to find $\Delta \pmb
 Then we may formulate this as a convex optimization problem as follows:
 
 \begin{align}
-    \min \quad & || \Delta \pmb{q} ||^2 \\
-    \mathrm{s.t.} \quad & || \pmb{q} + \Delta \pmb{q} ||^2 -1 = 0
+	\min \quad          & || \Delta \pmb{q} ||^2                  \\
+	\mathrm{s.t.} \quad & || \pmb{q} + \Delta \pmb{q} ||^2 -1 = 0
 \end{align}
 
 We introduce the augmented lagragian with multiplier $\lambda$
 \begin{align*}
-    \mathcal{L} &= || \Delta \pmb{q} ||^2 + \lambda \left[ || \pmb{q} + \Delta \pmb{q} ||^2 - 1 \right] \\
-    &= \transpose{\left(\Delta \pmb{q} \right)} \Delta \pmb{q} + \lambda \left[ \transpose{\left(\pmb{q} + \Delta \pmb{q}\right)} \left(\pmb{q} + \Delta \pmb{q} \right) - 1 \right] \\
-    &= \transpose{\left(\Delta \pmb{q} \right)} \Delta \pmb{q} + \lambda \left[ \transpose{\pmb{q}} \pmb{q} + 2\transpose{\left(\Delta \pmb{q} \right)} \pmb{q} + \transpose{\left(\Delta \pmb{q} \right)} \Delta \pmb{q}  - 1 \right] \\
+	\mathcal{L} & = || \Delta \pmb{q} ||^2 + \lambda \left[ || \pmb{q} + \Delta \pmb{q} ||^2 - 1 \right]                                                                                                                                            \\
+	            & = \transpose{\left(\Delta \pmb{q} \right)} \Delta \pmb{q} + \lambda \left[ \transpose{\left(\pmb{q} + \Delta \pmb{q}\right)} \left(\pmb{q} + \Delta \pmb{q} \right) - 1 \right]                                                   \\
+	            & = \transpose{\left(\Delta \pmb{q} \right)} \Delta \pmb{q} + \lambda \left[ \transpose{\pmb{q}} \pmb{q} + 2\transpose{\left(\Delta \pmb{q} \right)} \pmb{q} + \transpose{\left(\Delta \pmb{q} \right)} \Delta \pmb{q}  - 1 \right] \\
 \end{align*}
 Then we have
 \begin{align*}
-    \mathrm{D}\mathcal{L} &= 2 \transpose{\left(\Delta \pmb{q} \right)} + 2 \lambda \left[ \transpose{\pmb{q}} + \transpose{\left(\Delta \pmb{q} \right)} \right] \\
-    &= \transpose{\pmb{0}}
+	\mathrm{D}\mathcal{L} & = 2 \transpose{\left(\Delta \pmb{q} \right)} + 2 \lambda \left[ \transpose{\pmb{q}} + \transpose{\left(\Delta \pmb{q} \right)} \right] \\
+	                      & = \transpose{\pmb{0}}
 \end{align*}
 Thus,
 \begin{align*}
-    \Delta \pmb{q} + \lambda \left[ \pmb{q} + \Delta \pmb{q} \right] &= \pmb{0} \\
-    \Delta \pmb{q} (1 + \lambda) + \lambda \pmb{q} &= \pmb{0} \\
-    \Delta \pmb{q} &= -\frac{\lambda \pmb{q}}{1 + \lambda}
+	\Delta \pmb{q} + \lambda \left[ \pmb{q} + \Delta \pmb{q} \right] & = \pmb{0}                              \\
+	\Delta \pmb{q} (1 + \lambda) + \lambda \pmb{q}                   & = \pmb{0}                              \\
+	\Delta \pmb{q}                                                   & = -\frac{\lambda \pmb{q}}{1 + \lambda}
 \end{align*}
 Then by substitution we have
 \begin{align*}
-    || \pmb{q} + \Delta \pmb{q} ||^2 -1 = 0 \\
-    || \pmb{q} - \frac{\lambda \pmb{q}}{1 + \lambda} ||^2 - 1 &= 0 \\
-    || \frac{1}{1 + \lambda} \pmb{q} ||^2 - 1 &= 0 \\
-    || \pmb{q} ||^2 - (1+\lambda)^2 &= 0 \\
+	|| \pmb{q} + \Delta \pmb{q} ||^2 -1 = 0                         \\
+	|| \pmb{q} - \frac{\lambda \pmb{q}}{1 + \lambda} ||^2 - 1 & = 0 \\
+	|| \frac{1}{1 + \lambda} \pmb{q} ||^2 - 1                 & = 0 \\
+	|| \pmb{q} ||^2 - (1+\lambda)^2                           & = 0 \\
 \end{align*}
 We can formulate this as a quadratic in $\lambda$ as follows
 \begin{align*}
-    \lambda^2 + 2\lambda + 1 - || \pmb{q} ||^2 &= 0 \\
-    \lambda &= \frac{-2 \pm \sqrt{4 - 4\left(1- ||\pmb{q}||^2\right)}}{2} \\
-    &= -1 \pm || \pmb{q} ||
+	\lambda^2 + 2\lambda + 1 - || \pmb{q} ||^2 & = 0                                                          \\
+	\lambda                                    & = \frac{-2 \pm \sqrt{4 - 4\left(1- ||\pmb{q}||^2\right)}}{2} \\
+	                                           & = -1 \pm || \pmb{q} ||
 \end{align*}
 So we have
 \begin{align*}
-    \Delta \pmb{q} &= - \frac{\lambda}{1 + \lambda} \pmb{q} \\
-    &= - \frac{-1 \pm || \pmb{q} ||}{1 + -1 \pm || \pmb{q} ||} \pmb{q} \\
-    &= \frac{1 \mp || \pmb{q} || }{\pm || \pmb{q} ||} \pmb{q}
+	\Delta \pmb{q} & = - \frac{\lambda}{1 + \lambda} \pmb{q}                           \\
+	               & = - \frac{-1 \pm || \pmb{q} ||}{1 + -1 \pm || \pmb{q} ||} \pmb{q} \\
+	               & = \frac{1 \mp || \pmb{q} || }{\pm || \pmb{q} ||} \pmb{q}
 \end{align*}
 These are two potential solutions but we seek the one that minimizes $|| \Delta \pmb{q} || ^2$.
 \begin{align*}
-    || \Delta \pmb{q} ||^2 &= \left( \frac{1 \mp || \pmb{q} ||}{\pm || \pmb{q} ||} \right)^2 || \pmb{q} ||^2
+	|| \Delta \pmb{q} ||^2 & = \left( \frac{1 \mp || \pmb{q} ||}{\pm || \pmb{q} ||} \right)^2 || \pmb{q} ||^2
 \end{align*}
 Since $|| \pmb{q} || > 0$, we have that
 \begin{align*}
-    \left( \frac{1 - ||\pmb{q}|| }{||\pmb{q}||} \right)^2 &= \frac{1 - 2 || \pmb{q} || + ||\pmb{q}||^2}{||\pmb{q}||^2} \\
-    &< \frac{1 - 2 || \pmb{q} || + ||\pmb{q}||^2}{||\pmb{q}||^2} + \frac{4 || \pmb{q} ||}{|| \pmb{q} ||^2} \\
-    &= \frac{1 + 2 || \pmb{q} || + ||\pmb{q}||^2}{||\pmb{q}||^2} \\
-    &= \left( \frac{1 + ||\pmb{q}|| }{-||\pmb{q}||} \right)^2
+	\left( \frac{1 - ||\pmb{q}|| }{||\pmb{q}||} \right)^2 & = \frac{1 - 2 || \pmb{q} || + ||\pmb{q}||^2}{||\pmb{q}||^2}                                           \\
+	                                                      & < \frac{1 - 2 || \pmb{q} || + ||\pmb{q}||^2}{||\pmb{q}||^2} + \frac{4 || \pmb{q} ||}{|| \pmb{q} ||^2} \\
+	                                                      & = \frac{1 + 2 || \pmb{q} || + ||\pmb{q}||^2}{||\pmb{q}||^2}                                           \\
+	                                                      & = \left( \frac{1 + ||\pmb{q}|| }{-||\pmb{q}||} \right)^2
 \end{align*}
 Thus, we have eliminated one of the proposals and have arrived at our final solution:
 \begin{align}
-    \Delta \pmb{q} &= \frac{1 - ||\pmb{q} ||}{|| \pmb{q} ||} \pmb{q}
+	\Delta \pmb{q} & = \frac{1 - ||\pmb{q} ||}{|| \pmb{q} ||} \pmb{q}
 \end{align}
 Then $||\Delta \pmb{q}||^2$ is minimized while satisfying $|| \pmb{q} + \Delta \pmb{q} || = 1$
 Then
 \begin{align*}
-    \pmb{q} + \Delta \pmb{q} &= \frac{1 - ||\pmb{q}||}{||\pmb{q}||} \pmb{q} + \pmb{q} \\
-    &= \frac{\pmb{q}}{||\pmb{q}||}
+	\pmb{q} + \Delta \pmb{q} & = \frac{1 - ||\pmb{q}||}{||\pmb{q}||} \pmb{q} + \pmb{q} \\
+	                         & = \frac{\pmb{q}}{||\pmb{q}||}
 \end{align*}
 
 \section{Optimization over Quaternions}
 
 \begin{align*}
-    \prescript{w}{}{\pmb{q}}_{a} &= \begin{bmatrix}
-        \prescript{w}{}{s}_a \\
-        \prescript{w}{}{v}_a
-    \end{bmatrix} \\
-    \prescript{a}{}{\pmb{q}}_b &= \begin{bmatrix}
-        \prescript{a}{}{s}_b \\
-        \prescript{a}{}{v}_b
-    \end{bmatrix}
+	\prescript{w}{}{\pmb{q}}_{a} & = \begin{bmatrix}
+		                                 \prescript{w}{}{s}_a \\
+		                                 \prescript{w}{}{v}_a
+	                                 \end{bmatrix} \\
+	\prescript{a}{}{\pmb{q}}_b   & = \begin{bmatrix}
+		                                 \prescript{a}{}{s}_b \\
+		                                 \prescript{a}{}{v}_b
+	                                 \end{bmatrix}
 \end{align*}
 
 \subsection{Quaternion Composition}
 
 \begin{align*}
-    L \left( \pmb{q} \right) &= \begin{bmatrix}
-        q_w & -q_x & -q_y & -q_z \\
-        q_x & q_w & -q_z & q_y  \\
-        q_y & q_z & q_w & -q_x \\
-        q_z & -q_y & q_x & q_w
-    \end{bmatrix} \\
+	L \left( \pmb{q} \right) & = \begin{bmatrix}
+		                             q_w & -q_x & -q_y & -q_z \\
+		                             q_x & q_w  & -q_z & q_y  \\
+		                             q_y & q_z  & q_w  & -q_x \\
+		                             q_z & -q_y & q_x  & q_w
+	                             \end{bmatrix} \\
 \end{align*}
 
 \begin{align*}
-    R \left( \pmb{q} \right) &= \begin{bmatrix}
-        q_w & -q_x & -q_y & -q_z \\
-        q_x & q_w & q_z & -q_y  \\
-        q_y & -q_z & q_w & q_x \\
-        q_z & q_y & -q_x & q_w
-    \end{bmatrix}
+	R \left( \pmb{q} \right) & = \begin{bmatrix}
+		                             q_w & -q_x & -q_y & -q_z \\
+		                             q_x & q_w  & q_z  & -q_y \\
+		                             q_y & -q_z & q_w  & q_x  \\
+		                             q_z & q_y  & -q_x & q_w
+	                             \end{bmatrix}
 \end{align*}
 
 \begin{align*}
-    \prescript{w}{}{\pmb{q}}_b &= f(\prescript{w}{}{\pmb{q}}_a, \prescript{a}{}{\pmb{q}}_b) \\
-    &= L \left( \prescript{w}{}{\pmb{q}}_a \right) \prescript{a}{}{\pmb{q}}_b \\
-    &= R \left( \prescript{a}{}{\pmb{q}}_b \right) \prescript{w}{}{\pmb{q}}_a \\
+	\prescript{w}{}{\pmb{q}}_b & = f(\prescript{w}{}{\pmb{q}}_a, \prescript{a}{}{\pmb{q}}_b)              \\
+	                           & = L \left( \prescript{w}{}{\pmb{q}}_a \right) \prescript{a}{}{\pmb{q}}_b \\
+	                           & = R \left( \prescript{a}{}{\pmb{q}}_b \right) \prescript{w}{}{\pmb{q}}_a \\
 \end{align*}
 
 \begin{align*}
-    Df(\pmb{q}_1, \pmb{q}_2) &= \begin{bmatrix}
-        R(\pmb{q}_2) & L(\pmb{q}_1)
-    \end{bmatrix}
+	Df(\pmb{q}_1, \pmb{q}_2) & = \begin{bmatrix}
+		                             R(\pmb{q}_2) & L(\pmb{q}_1)
+	                             \end{bmatrix}
 \end{align*}
 
 \subsection{Quaternion-Point Rotation}
 
 \begin{align*}
-    M\left( \pmb{q} \right) &= \begin{bmatrix}
-        q_w^2 + q_x^2 - q_y^2 - q_z^2 & 2(q_x q_y - q_w q_z) & 2(q_x q_z + q_w q_y) \\
-        2(q_x q_y + q_w q_z) & q_w^2 - q_x^2 + q_y^2 - q_z^2 & 2(q_y q_z - q_w q_x) \\
-        2(q_x q_z - q_w q_y) & 2(q_y q_z + q_w q_x) & q_w^2 - q_x^2 - q_y^2 + q_z^2
-    \end{bmatrix}
+	M\left( \pmb{q} \right) & = \begin{bmatrix}
+		                            q_w^2 + q_x^2 - q_y^2 - q_z^2 & 2(q_x q_y - q_w q_z)          & 2(q_x q_z + q_w q_y)          \\
+		                            2(q_x q_y + q_w q_z)          & q_w^2 - q_x^2 + q_y^2 - q_z^2 & 2(q_y q_z - q_w q_x)          \\
+		                            2(q_x q_z - q_w q_y)          & 2(q_y q_z + q_w q_x)          & q_w^2 - q_x^2 - q_y^2 + q_z^2
+	                            \end{bmatrix}
 \end{align*}
 
 \begin{align*}
-    N(\pmb{q}, x) &= \begin{bmatrix}
-        2 q_w x - 2 q_z y + 2 q_y z & 2 q_x x + 2 q_y y + 2 q_z z & -2 q_y x + 2 q_x y + 2 q_w z & -2 q_z x - 2 q_w y + 2 q_x z \\
-        2 q_z x + 2 q_w y - 2 q_x z & 2 q_y x - 2 q_x y - 2 q_w z & 2 q_x x + 2 q_y y + 2 q_z z & 2 q_w x - 2 q_z y + 2 q_y z \\
-        -2 q_y x + 2 q_x y + 2 q_w z & 2 q_z x + 2 q_w y - 2 q_x z & - 2 q_w x + 2 q_z y - 2 q_y z & 2 q_x x + 2 q_y y + 2 q_z z \\
-    \end{bmatrix}
+	N(\pmb{q}, x) & = \begin{bmatrix}
+		                  2 q_w x - 2 q_z y + 2 q_y z  & 2 q_x x + 2 q_y y + 2 q_z z & -2 q_y x + 2 q_x y + 2 q_w z  & -2 q_z x - 2 q_w y + 2 q_x z \\
+		                  2 q_z x + 2 q_w y - 2 q_x z  & 2 q_y x - 2 q_x y - 2 q_w z & 2 q_x x + 2 q_y y + 2 q_z z   & 2 q_w x - 2 q_z y + 2 q_y z  \\
+		                  -2 q_y x + 2 q_x y + 2 q_w z & 2 q_z x + 2 q_w y - 2 q_x z & - 2 q_w x + 2 q_z y - 2 q_y z & 2 q_x x + 2 q_y y + 2 q_z z  \\
+	                  \end{bmatrix}
 \end{align*}
 
 \begin{align*}
-    \prescript{b}{}{x} &= g\left(\prescript{b}{}{\pmb{q}}_a, \prescript{a}{}{x}\right) \\
-    &= \left(\prescript{b}{}{\pmb{q}}_a * \hat{\prescript{a}{}{x}}\right)^\vee \\
-    &= M\left( \prescript{b}{}{\pmb{q}}_a \right) \prescript{a}{}{x} \\
-    &= N\left( \prescript{b}{}{\pmb{q}}_a, \prescript{a}{}{x} \right) \prescript{b}{}{\pmb{q}}_a
+	\prescript{b}{}{x} & = g\left(\prescript{b}{}{\pmb{q}}_a, \prescript{a}{}{x}\right)                              \\
+	                   & = \left(\prescript{b}{}{\pmb{q}}_a * \hat{\prescript{a}{}{x}}\right)^\vee                   \\
+	                   & = M\left( \prescript{b}{}{\pmb{q}}_a \right) \prescript{a}{}{x}                             \\
+	                   & = N\left( \prescript{b}{}{\pmb{q}}_a, \prescript{a}{}{x} \right) \prescript{b}{}{\pmb{q}}_a
 \end{align*}
 
 \begin{align*}
-    Dg(\pmb{q}, x) &= \begin{bmatrix}
-        N(\pmb{q}, x) & M(\pmb{q})
-    \end{bmatrix}
+	Dg(\pmb{q}, x) & = \begin{bmatrix}
+		                   N(\pmb{q}, x) & M(\pmb{q})
+	                   \end{bmatrix}
 \end{align*}
 
 \subsection{Pose Composition}
 
 \begin{align*}
-    \prescript{c}{}{T}_b &= \left( \prescript{c}{}{\pmb{q}}_b, \prescript{c}{}{t}_b \right) \\
-    \prescript{b}{}{T}_a &= \left( \prescript{b}{}{\pmb{q}}_a, \prescript{b}{}{t}_a \right) \\
-    \prescript{c}{}{T}_a &= h\left( \prescript{c}{}{T}_b, \prescript{b}{}{T}_a \right) \\
-    &= \left( f\left(\prescript{c}{}{\pmb{q}}_b, \prescript{b}{}{\pmb{q}}_a \right), g \left( \prescript{c}{}{\pmb{q}}_b, \prescript{b}{}{t}_a \right) + \prescript{c}{}{t}_b \right) \\
+	\prescript{c}{}{T}_b & = \left( \prescript{c}{}{\pmb{q}}_b, \prescript{c}{}{t}_b \right)                                                                                                                \\
+	\prescript{b}{}{T}_a & = \left( \prescript{b}{}{\pmb{q}}_a, \prescript{b}{}{t}_a \right)                                                                                                                \\
+	\prescript{c}{}{T}_a & = h\left( \prescript{c}{}{T}_b, \prescript{b}{}{T}_a \right)                                                                                                                     \\
+	                     & = \left( f\left(\prescript{c}{}{\pmb{q}}_b, \prescript{b}{}{\pmb{q}}_a \right), g \left( \prescript{c}{}{\pmb{q}}_b, \prescript{b}{}{t}_a \right) + \prescript{c}{}{t}_b \right) \\
 \end{align*}
 
 Then we have
 
 \begin{align*}
-    Dh\left(\prescript{c}{}{T}_b, \prescript{b}{}{T}_a \right) &= \begin{bmatrix}
-        D_1 f\left(\prescript{c}{}{\pmb{q}}_b, \prescript{b}{}{\pmb{q}}_a \right)& 0 &  D_1 f\left(\prescript{c}{}{\pmb{q}}_b, \prescript{b}{}{\pmb{q}}_a \right) & 0 \\
-        D_1 g\left( \prescript{c}{}{\pmb{q}}_b, \prescript{b}{}{t}_a\right) & I_3 & 0 & D_2 g\left( \prescript{c}{}{\pmb{q}}_b, \prescript{b}{}{t}_a\right)
-    \end{bmatrix} \\
-    &= \begin{bmatrix}
-        R\left( \prescript{c}{}{\pmb{q}}_b \right) & 0_{4 \times 3} & L\left( \prescript{b}{}{\pmb{q}}_a \right) & 0_{4 \times 3} \\
-        N\left( \prescript{c}{}{\pmb{q}}_b, \prescript{b}{}{t}_a \right) & I_3 & 0_{3 \times 4} & M\left( \prescript{c}{}{\pmb{q}}_b \right)
-    \end{bmatrix}
+	Dh\left(\prescript{c}{}{T}_b, \prescript{b}{}{T}_a \right) & = \begin{bmatrix}
+		                                                               D_1 f\left(\prescript{c}{}{\pmb{q}}_b, \prescript{b}{}{\pmb{q}}_a \right) & 0   & D_1 f\left(\prescript{c}{}{\pmb{q}}_b, \prescript{b}{}{\pmb{q}}_a \right) & 0                                                                   \\
+		                                                               D_1 g\left( \prescript{c}{}{\pmb{q}}_b, \prescript{b}{}{t}_a\right)       & I_3 & 0                                                                         & D_2 g\left( \prescript{c}{}{\pmb{q}}_b, \prescript{b}{}{t}_a\right)
+	                                                               \end{bmatrix} \\
+	                                                           & = \begin{bmatrix}
+		                                                               R\left( \prescript{c}{}{\pmb{q}}_b \right)                       & 0_{4 \times 3} & L\left( \prescript{b}{}{\pmb{q}}_a \right) & 0_{4 \times 3}                             \\
+		                                                               N\left( \prescript{c}{}{\pmb{q}}_b, \prescript{b}{}{t}_a \right) & I_3            & 0_{3 \times 4}                             & M\left( \prescript{c}{}{\pmb{q}}_b \right)
+	                                                               \end{bmatrix}
 \end{align*}
 
 \section{Unit Quaternion Algebra}
 
 \begin{IEEEeqnarray}{lCl}
-    L(q) & = & \begin{bmatrix}
-        s & -\transpose{v} \\
-        v & sI + \skewsym{v}
-    \end{bmatrix}
+	L(q) & = & \begin{bmatrix}
+		s & -\transpose{v}   \\
+		v & sI + \skewsym{v}
+	\end{bmatrix}
 \end{IEEEeqnarray}
 
 \begin{IEEEeqnarray}{lCl}
-    R(q) & = & \begin{bmatrix}
-        s & -\transpose{v} \\
-        v & sI - \skewsym{v}
-    \end{bmatrix}
+	R(q) & = & \begin{bmatrix}
+		s & -\transpose{v}   \\
+		v & sI - \skewsym{v}
+	\end{bmatrix}
 \end{IEEEeqnarray}
 
 \begin{IEEEeqnarray}{lCl}
-    L(q^{-1}) & = & \transpose{L}(q) \\
-    R(q^{-1}) & = & \transpose{R}(q)
+	L(q^{-1}) & = & \transpose{L}(q) \\
+	R(q^{-1}) & = & \transpose{R}(q)
 \end{IEEEeqnarray}
 
 \begin{IEEEeqnarray}{lCl}
-    q_3 & = & q_1 \odot q_2 \\
-    & = & L(q_1) q_2 \\
-    & = & R(q_2) q_1
+	q_3 & = & q_1 \odot q_2 \\
+	& = & L(q_1) q_2 \\
+	& = & R(q_2) q_1
 \end{IEEEeqnarray}
 
 \section{Exponential Map}
@@ -256,39 +258,85 @@ Then we have
 Let $\vec{\omega} = \omega \theta$. Where $\omega$ is a unit vector in $\mathbb{R}^3$.
 
 \begin{IEEEeqnarray}{lCl}
-    \mathrm{Exp}(\vec{\omega}) & = & \begin{bmatrix}
-        \cos{\frac{\theta}{2}} \\
-        \omega \sin{\frac{\theta}{2}}
-    \end{bmatrix}
+	\mathrm{Exp}(\vec{\omega}) & = & \begin{bmatrix}
+		\cos{\frac{\theta}{2}} \\
+		\omega \sin{\frac{\theta}{2}}
+	\end{bmatrix}
 \end{IEEEeqnarray}
 
 To compute numerically given $\vec{\omega}$, first compute $\theta = \norm{\vec{\omega}}$.
 Then if $|\theta| < \epsilon$, then by L'Hopital's rule, we have
 \begin{IEEEeqnarray}{lCl}
-    \mathrm{Exp}(\vec{\omega}) & = & \mathrm{normalized} \begin{bmatrix}
-        \cos{\frac{\theta}{2}} \\
-        \frac{\vec{\omega}}{2}
-    \end{bmatrix}
+	\mathrm{Exp}(\vec{\omega}) & = & \mathrm{normalized} \begin{bmatrix}
+		\cos{\frac{\theta}{2}} \\
+		\frac{\vec{\omega}}{2}
+	\end{bmatrix}
 \end{IEEEeqnarray}
 Otherwise if $|\theta| \ge \epsilon$, then we have
 \begin{IEEEeqnarray}{lCl}
-    \mathrm{Exp}(\vec{\omega}) & = & \begin{bmatrix}
-        \cos{\frac{\theta}{2}} \\
-        \frac{\sin{\frac{\theta}{2}}}{\theta}\vec{\omega}
-    \end{bmatrix}
+	\mathrm{Exp}(\vec{\omega}) & = & \begin{bmatrix}
+		\cos{\frac{\theta}{2}} \\
+		\frac{\sin{\frac{\theta}{2}}}{\theta}\vec{\omega}
+	\end{bmatrix}
 \end{IEEEeqnarray}
 
 \section{Logarithmic Map}
 
 Note that
 \begin{IEEEeqnarray}{lCl}
-    q & = & \begin{bmatrix}
-        \cos{\frac{\theta}{2}} \\
-        \omega \sin{\frac{\theta}{2}}
-    \end{bmatrix}
+	q & = & \begin{bmatrix}
+		\cos{\frac{\theta}{2}} \\
+		\omega \sin{\frac{\theta}{2}}
+	\end{bmatrix} \\
+	& = & \begin{bmatrix}
+		s \\
+		v
+	\end{bmatrix}
+\end{IEEEeqnarray}
+We seek to find $\vec{\omega} = \omega \theta$.
+
+By Taylor's Remainder Theorem,
+\begin{IEEEeqnarray}{lCl}
+	| \theta | < \delta & \Rightarrow & \left| \sin{\theta} - \theta \right| < \frac{1}{3!} \delta^3 \\
+	& \Rightarrow & \left| \cos{\theta} - \left(1 - \frac{1}{2} \theta^2 \right) \right| < \frac{1}{4!} \delta^4
 \end{IEEEeqnarray}
 
-We seek to find $\vec{\omega} = \omega \theta$.
+Let the max error between $\sin{\theta}$ and $\theta$ be given by $\epsilon$.
+\begin{IEEEeqnarray}{lCl}
+	\epsilon & = & \frac{1}{3!} \delta^3 \\
+	\delta & = & (6 \epsilon)^{1/3}
+\end{IEEEeqnarray}
+
+We define the sign function as
+\begin{IEEEeqnarray}{lCl}
+	\sign{x} & = & \begin{cases}
+		1  & x \ge 0 \\
+		-1 & x < 0
+	\end{cases} \\
+	& = & 2 (x \ge 0) - 1
+\end{IEEEeqnarray}
+
+Note that
+\begin{IEEEeqnarray}{lCl}
+	|s - \frac{\theta}{2} | < \frac{1}{3!} (\frac{\delta}{2})^3
+\end{IEEEeqnarray}
+
+
+Then we may compute the logarithm as follows:
+
+\begin{algorithmic}
+	\State Choose max error $\epsilon > 0$
+	\State Compute $\delta = 2(6 \epsilon)^{1/3}$
+	\State Compute $s_{\epsilon} = \cos{\delta}$
+	\If{$s > s_{\epsilon}$}
+	\State \Return $2*v$
+	\Else
+	\State $\theta \gets 2 \arccos(s)$
+	\State \Return $\frac{v}{\norm{v}} \sign{s} \theta$
+	\EndIf
+\end{algorithmic}
+
+
 
 
 \end{document}
