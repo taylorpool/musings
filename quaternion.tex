@@ -332,6 +332,7 @@ Then we may compute the logarithm as follows:
 	\State \Return $2*v$
 	\Else
 	\State $\theta \gets 2 \arccos(s)$
+	\State $\theta \gets \theta + 2\pi \left( (\theta < -\pi) - (\theta > \pi) \right)$
 	\State \Return $\frac{v}{\norm{v}} \sign{s} \theta$
 	\EndIf
 \end{algorithmic}
